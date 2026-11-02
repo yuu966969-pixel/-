@@ -1,0 +1,22 @@
+
+name: NekoAlarm
+
+options:
+  bundleIdPrefix: com.nekoalarm
+  deploymentTarget:
+    iOS: "26.0"
+
+targets:
+  NekoAlarm:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
