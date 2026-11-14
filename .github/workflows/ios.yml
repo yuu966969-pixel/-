@@ -2,17 +2,20 @@ name: NekoAlarm iOS Build
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
-    branches:
-      - main
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: nekoalarm-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   build:
-    name: Build NekoAlarm
+    name: Build and smoke-test NekoAlarm
     runs-on: macos-latest
+    timeout-minutes: 35
 
     steps:
       - name: Checkout repository
@@ -29,13 +32,40 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      - name: Validate app metadata
+        run: plutil -lint Info.plist
+
       - name: Build iOS Simulator app
         run: |
           xcodebuild \
             -project NekoAlarm.xcodeproj \
             -scheme NekoAlarm \
             -destination 'generic/platform=iOS Simulator' \
-            -derivedDataPath build/DerivedData \
+            -derivedDataPath build/SimulatorDerivedData \
+            CODE_SIGNING_ALLOWED=NO \
+            build
+
+      - name: Install and launch on iPhone Simulator
+        run: |
+          DEVICE_ID="$(xcrun simctl list devices available | sed -nE 's/.*iPhone.*\\(([0-9A-F-]{36})\\).*/\\1/p' | head -n 1)"
+          if [ -z "$DEVICE_ID" ]; then
+            echo 'No available iPhone Simulator device found.'
+            xcrun simctl list devices available
+            exit 1
+          fi
+          APP_PATH='build/SimulatorDerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app'
+          xcrun simctl boot "$DEVICE_ID" || true
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+          xcrun simctl install "$DEVICE_ID" "$APP_PATH"
+          xcrun simctl launch "$DEVICE_ID" com.nekoalarm.app
+
+      - name: Build unsigned iPhone device app
+        run: |
+          xcodebuild \
+            -project NekoAlarm.xcodeproj \
+            -scheme NekoAlarm \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build/DeviceDerivedData \
             CODE_SIGNING_ALLOWED=NO \
             build
 
@@ -43,6 +73,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: NekoAlarm-iOS-Simulator
-          path: build/DerivedData/Build/Products/Debug-iphonesimulator/
+          path: build/SimulatorDerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload unsigned iPhone app
+        uses: actions/upload-artifact@v4
+        with:
+          name: NekoAlarm-iOS-Device-Unsigned
+          path: build/DeviceDerivedData/Build/Products/Debug-iphoneos/NekoAlarm.app
           if-no-files-found: error
           retention-days: 14
