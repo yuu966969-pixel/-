@@ -1,17 +1,20 @@
-# NekoAlarm build status
+# Build status
 
-## Verified
-- XcodeGen project generation succeeds.
-- Swift compilation for the iOS Simulator succeeds.
-- GitHub Actions packages and uploads the simulator app bundle.
-- AlarmKit is configured with a daily repeating schedule and requests authorization at runtime.
-- If the optional AI audio endpoint is unavailable, the app generates an original procedural WAV track locally and uses it as the custom alarm sound.
+## Verified in CI
+
+- XcodeGen successfully generates `NekoAlarm.xcodeproj`.
+- The iOS Simulator target compiles successfully.
+- The workflow publishes a `NekoAlarm-iOS-Simulator` artifact.
+- The app has an offline procedural WAV fallback. This is original generated audio, not AI-generated music.
+- If `NEKO_AI_AUDIO_ENDPOINT` is configured in the app's Info.plist and the service returns a valid audio response, the app attempts to use that remote track instead.
+- Alarm scheduling is configured to repeat every day of the week and falls back to the system alarm sound when no daily track is available.
 
 ## Not yet verified
-- Installation and alarm behavior on a physical iPhone.
-- A signed device build or IPA.
-- A configured AI audio service. The local procedural track is not AI-generated.
-- Exact 00:05 background execution; iOS background task scheduling is opportunistic.
-- Password/quiz integration with the system alarm dismissal. The current quiz is only an in-app demonstration.
 
-See [BUILDING.md](BUILDING.md) for build instructions and limitations.
+- AlarmKit behavior on a physical iPhone.
+- Background refresh timing. iOS treats background processing as opportunistic; the app cannot guarantee generation at exactly 00:05.
+- A working hosted AI audio service. No endpoint is configured in this repository.
+- Signed iPhone installation, TestFlight, or App Store distribution. The repository does not contain Apple signing credentials or provisioning profiles.
+- The password and quiz are app-local practice UI only. They do not gate the system AlarmKit dismiss action.
+
+See [BUILDING.md](BUILDING.md) for build artifacts and signing requirements.
