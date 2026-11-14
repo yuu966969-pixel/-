@@ -60,7 +60,7 @@ enum NekoBackgroundRefresh {
                                              matching: DateComponents(hour: 0, minute: 5),
                                              matchingPolicy: .nextTime)
         request.earliestBeginDate = next
-        request.requiresNetworkConnectivity = true
+        request.requiresNetworkConnectivity = false
         request.requiresExternalPower = false
         try? BGTaskScheduler.shared.submit(request)
     }
