@@ -1,42 +1,29 @@
-# NekoAlarm build and test
+# NekoAlarm build and installation
 
-## Automated build
+## CI artifacts
 
-GitHub Actions uses XcodeGen and Xcode to compile the app for the iOS Simulator without code signing. The workflow uploads the `NekoAlarm-iOS-Simulator` artifact. The ZIP contains a `NekoAlarm.app` bundle that can be installed in an iOS Simulator on a Mac.
+The GitHub Actions workflow builds the app without code signing and uploads artifacts:
 
-This is **not** an installable iPhone IPA and cannot be installed directly on a physical iPhone.
+- `NekoAlarm-iOS-Simulator`: simulator app bundle. Intended for Xcode Simulator, not direct installation on an iPhone.
+- `NekoAlarm-iOS-Device-Unsigned`: unsigned iPhone app bundle. It is not installable on a physical iPhone until signed with a valid Apple development identity and provisioning profile.
+
+Open the repository's **Actions** tab, select a successful **NekoAlarm iOS Build** run, then download the artifact from the run's Artifacts section. Artifacts expire after 14 days.
 
 ## Local build
 
-Requirements:
-- macOS with Xcode 26.1 or later
-- Xcode command line tools
-- XcodeGen
+1. Install Xcode with an iOS 26.1 SDK and XcodeGen.
+2. Run `xcodegen generate` from the repository root.
+3. Open `NekoAlarm.xcodeproj` in Xcode.
+4. Select an iOS Simulator destination and build.
 
-Run:
+## Physical iPhone
 
-```sh
-brew install xcodegen
-xcodegen generate
-xcodebuild \
-  -project NekoAlarm.xcodeproj \
-  -scheme NekoAlarm \
-  -destination 'generic/platform=iOS Simulator' \
-  CODE_SIGNING_ALLOWED=NO \
-  build
-```
+To install on a physical iPhone, configure a valid Apple development team, bundle identifier, signing certificate, and provisioning profile in Xcode or the CI environment. Do not commit signing certificates, private keys, or provisioning profiles to this public repository.
 
-## Audio generation
+## Known product limitations
 
-If the optional `NEKO_AI_AUDIO_ENDPOINT` Info.plist value is configured, the app sends a POST request containing the date, prompt, and requested MP3 format to that endpoint. The endpoint must return MP3 bytes.
-
-If the endpoint is absent or unavailable, the app creates an original, procedurally synthesized WAV track on-device. This offline fallback is **not AI-generated**. AlarmKit uses the generated track when available and the system default sound otherwise.
-
-Do not commit API secrets or private service credentials to this repository.
-
-## Current limitations
-
-- AlarmKit scheduling requests authorization and configures a repeating daily schedule, but physical-device behavior has not yet been tested.
-- Background refresh is opportunistic; iOS does not guarantee execution at exactly 00:05. The app also checks for a new daily track when it is opened.
-- The password and quiz are an in-app demonstration only. They do not prevent dismissal of the system AlarmKit alarm.
-- No signed iPhone IPA or App Store/TestFlight build is produced by this workflow. Physical-device distribution requires signing and provisioning configured in Xcode.
+- The daily offline soundtrack is procedural audio generated on-device. It is not AI music.
+- AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No such service is configured in this repository.
+- iOS background refresh is opportunistic and cannot guarantee execution at an exact time.
+- The password and quiz screens are app-local demonstrations. They do not prevent dismissal of the system AlarmKit alarm.
+- Physical-device AlarmKit behavior still needs to be tested on an iPhone.
