@@ -21,12 +21,8 @@ targets:
       - path: あな.swift
       - path: NekoAlarmMetadata.swift
     info:
-      properties:
-        NSAlarmKitUsageDescription: "指定した時刻にアラームを鳴らすために使用します。"
-        BGTaskSchedulerPermittedIdentifiers:
-          - jp.example.NekoAlarm.dailyTrackRefresh
-        NSSupportsLiveActivities: true
+      path: Info.plist
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
-        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: Info.plist
