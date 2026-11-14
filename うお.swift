@@ -1,4 +1,5 @@
 import AlarmKit
+import ActivityKit
 import SwiftUI
 import Foundation
 
@@ -49,8 +50,8 @@ enum AlarmScheduler {
 
         // 予定時刻の60秒前からロック画面にカウントダウンを表示します。
         let duration = Alarm.CountdownDuration(preAlert: 60, postAlert: 60)
-
-        let configuration = AlarmManager.AlarmConfiguration<NekoAlarmMetadata>(
+        typealias Configuration = AlarmManager.AlarmConfiguration<NekoAlarmMetadata>
+        let configuration = Configuration(
             countdownDuration: duration,
             schedule: schedule,
             attributes: attributes,
@@ -61,7 +62,6 @@ enum AlarmScheduler {
         return id
     }
 }
-
 
 enum AlarmSetupError: LocalizedError {
     case notAuthorized
