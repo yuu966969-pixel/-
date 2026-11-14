@@ -84,14 +84,16 @@ struct ContentView: View {
                         Task {
                             do {
                                 await dailyTrack.generateIfNeeded()
-                                let soundName = try dailyTrack.prepareAlarmSound()
+                                let soundName = try? dailyTrack.prepareAlarmSound()
                                 let components = Calendar.current.dateComponents([.hour, .minute], from: alarmTime)
                                 _ = try await AlarmScheduler.schedule(
                                     hour: components.hour ?? 7,
                                     minute: components.minute ?? 0,
                                     soundResourceName: soundName
                                 )
-                                message = "アラームを予約しました。ロック画面にもカウントダウンが表示されます。"
+                                message = soundName == nil
+                                    ? "毎日のアラームを予約しました。AI曲未設定のためシステム音を使います。"
+                                    : "毎日のアラームを予約しました。"
                             } catch {
                                 message = error.localizedDescription
                             }

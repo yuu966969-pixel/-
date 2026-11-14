@@ -1,9 +1,10 @@
 import AlarmKit
+import ActivityKit
 import SwiftUI
 import Foundation
 
 enum AlarmScheduler {
-    static func schedule(hour: Int, minute: Int, soundResourceName: String) async throws -> UUID {
+    static func schedule(hour: Int, minute: Int, soundResourceName: String?) async throws -> UUID {
         let manager = AlarmManager.shared
 
         let authorization = try await manager.requestAuthorization()
@@ -13,55 +14,33 @@ enum AlarmScheduler {
 
         let id = UUID()
         let alert = AlarmPresentation.Alert(title: "🐱 猫ミーム地獄アラーム")
-
-        let countdown = AlarmPresentation.Countdown(
-            title: "猫ミーム接近中",
-            pauseButton: AlarmButton(
-                text: "一時停止",
-                textColor: .white,
-                systemImageName: "pause.fill"
-            )
-        )
-
-        let paused = AlarmPresentation.Paused(
-            title: "猫ミーム待機中",
-            resumeButton: AlarmButton(
-                text: "再開",
-                textColor: .white,
-                systemImageName: "play.fill"
-            )
-        )
-
         let attributes = AlarmAttributes<NekoAlarmMetadata>(
-            presentation: AlarmPresentation(
-                alert: alert,
-                countdown: countdown,
-                paused: paused
-            ),
+            presentation: AlarmPresentation(alert: alert),
             metadata: NekoAlarmMetadata(),
             tintColor: Color.pink
         )
 
         let time = Alarm.Schedule.Relative.Time(hour: hour, minute: minute)
+        let everyDay = Alarm.Schedule.Relative.Recurrence.weekly([
+            .monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday
+        ])
         let schedule = Alarm.Schedule.relative(
-            .init(time: time, repeats: .never)
+            .init(time: time, repeats: everyDay)
         )
 
-        // 予定時刻の60秒前からロック画面にカウントダウンを表示します。
-        let duration = Alarm.CountdownDuration(preAlert: 60, postAlert: 60)
-
+        // Use the generated daily track when available; otherwise use the system alarm sound.
+        let sound = soundResourceName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
         let configuration = AlarmManager.AlarmConfiguration<NekoAlarmMetadata>(
-            countdownDuration: duration,
+            countdownDuration: nil,
             schedule: schedule,
             attributes: attributes,
-            sound: AlertConfiguration.AlertSound.named(soundResourceName)
+            sound: sound
         )
 
         try await manager.schedule(id: id, configuration: configuration)
         return id
     }
 }
-
 
 enum AlarmSetupError: LocalizedError {
     case notAuthorized

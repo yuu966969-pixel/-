@@ -3,7 +3,7 @@ name: NekoAlarm
 options:
   bundleIdPrefix: com.nekoalarm
   deploymentTarget:
-    iOS: "26.0"
+    iOS: "26.1"
 
 settings:
   base:
@@ -15,25 +15,14 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: App
-      - path: Shared
+      - path: あま.swift
+      - path: ドパ.swift
+      - path: うお.swift
+      - path: あな.swift
+      - path: NekoAlarmMetadata.swift
+    info:
+      path: Info.plist
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
-        INFOPLIST_KEY_NSSupportsLiveActivities: YES
-        GENERATE_INFOPLIST_FILE: YES
-
-  NekoAlarmWidget:
-    type: app-extension
-    platform: iOS
-    sources:
-      - path: WidgetExtension
-      - path: Shared
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app.widget
-        GENERATE_INFOPLIST_FILE: YES
-        APPLICATION_EXTENSION_API_ONLY: YES
-        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
-    dependencies:
-      - target: NekoAlarm
+        INFOPLIST_FILE: Info.plist
