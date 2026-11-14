@@ -39,16 +39,10 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
 
-      - name: Package simulator app
-        run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            build/DerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app \
-            NekoAlarm-iOS-Simulator.zip
-
-      - name: Upload simulator build
+      - name: Upload simulator app
         uses: actions/upload-artifact@v4
         with:
           name: NekoAlarm-iOS-Simulator
-          path: NekoAlarm-iOS-Simulator.zip
+          path: build/DerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app
           if-no-files-found: error
           retention-days: 14
