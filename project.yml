@@ -21,6 +21,7 @@ targets:
       - path: あな.swift
       - path: NekoAlarmMetadata.swift
     info:
+      path: NekoAlarm-Info.plist
       properties:
         NSAlarmKitUsageDescription: "指定した時刻に毎日のアラームを鳴らすために使用します。"
         BGTaskSchedulerPermittedIdentifiers:
