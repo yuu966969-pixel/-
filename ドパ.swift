@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var isSpinning = false
     @State private var quizIndex = 0
     @State private var quizPassed = false
+    @State private var passwordPassed = false
 
     private let questions: [(String, [String], Int)] = [
         ("日本の首都は？", ["東京", "大阪", "京都", "札幌"], 0),
@@ -34,7 +35,7 @@ struct ContentView: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    GroupBox("① 今日のランダムAI曲") {
+                    GroupBox("① 今日のランダム曲") {
                         VStack(alignment: .leading, spacing: 10) {
                             Label(dailyTrack.status, systemImage: dailyTrack.hasTrackForToday ? "checkmark.circle.fill" : "waveform")
                             Button {
@@ -49,7 +50,7 @@ struct ContentView: View {
                                 Label("今日の曲を試聴", systemImage: "play.fill")
                             }
                             .disabled(!dailyTrack.hasTrackForToday)
-                            Text("日付ごとに1曲を保存。AlarmKitのアラーム音にも使います。生成通知は出しません。")
+                            Text("AI音源サーバーがあればAI生成し、未設定・接続失敗時は端末内でオリジナルのランダム曲を作ります。")
                                 .font(.caption).foregroundStyle(.secondary)
                         }
                     }
@@ -71,6 +72,9 @@ struct ContentView: View {
                                 }
                                 passwordHash = Self.hash(newPassword)
                                 newPassword = ""
+                                enteredPassword = ""
+                                passwordPassed = false
+                                quizPassed = false
                                 message = "パスワードを保存しました。"
                             }
                             .buttonStyle(.borderedProminent)
@@ -92,7 +96,7 @@ struct ContentView: View {
                                     soundResourceName: soundName
                                 )
                                 message = soundName == nil
-                                    ? "毎日のアラームを予約しました。AI曲未設定のためシステム音を使います。"
+                                    ? "毎日のアラームを予約しました。曲が未準備のためシステム音を使います。"
                                     : "毎日のアラームを予約しました。"
                             } catch {
                                 message = error.localizedDescription
@@ -111,16 +115,19 @@ struct ContentView: View {
                                 .textFieldStyle(.roundedBorder)
                             Button("パスワードを確認") {
                                 guard !passwordHash.isEmpty, Self.hash(enteredPassword) == passwordHash else {
+                                    passwordPassed = false
+                                    quizPassed = false
                                     message = "パスワードが違います。"
                                     return
                                 }
+                                passwordPassed = true
                                 quizIndex = 0
                                 quizPassed = false
                                 message = "パスワードOK！クイズに進めます。"
                             }
                             .buttonStyle(.bordered)
 
-                            if !passwordHash.isEmpty {
+                            if passwordPassed {
                                 Text(questions[quizIndex].0)
                                     .font(.headline)
                                 ForEach(questions[quizIndex].1.indices, id: \.self) { index in
@@ -144,6 +151,10 @@ struct ContentView: View {
                                     Label("クイズクリア！", systemImage: "checkmark.seal.fill")
                                         .foregroundStyle(.green)
                                 }
+                            } else {
+                                Text("パスワードを確認するとクイズが表示されます。")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
