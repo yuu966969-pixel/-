@@ -59,7 +59,8 @@ final class DailyTrackGenerator: ObservableObject {
         if !FileManager.default.fileExists(atPath: destination.path) {
             try FileManager.default.copyItem(at: source, to: destination)
         }
-        return resourceName
+        // Include the extension: AlarmKit resolves the complete sound filename.
+        return resourceName + "." + source.pathExtension
     }
 
     func generateIfNeeded() async {
