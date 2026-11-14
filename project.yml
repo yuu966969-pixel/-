@@ -15,25 +15,14 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: App
-      - path: Shared
+      - path: あま.swift
+      - path: ドパ.swift
+      - path: うお.swift
+      - path: あな.swift
+      - path: NekoAlarmMetadata.swift
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
+        GENERATE_INFOPLIST_FILE: YES
         INFOPLIST_KEY_NSSupportsLiveActivities: YES
-        GENERATE_INFOPLIST_FILE: YES
-
-  NekoAlarmWidget:
-    type: app-extension
-    platform: iOS
-    sources:
-      - path: WidgetExtension
-      - path: Shared
-    settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app.widget
-        GENERATE_INFOPLIST_FILE: YES
-        APPLICATION_EXTENSION_API_ONLY: YES
-        INFOPLIST_KEY_NSExtension_NSExtensionPointIdentifier: com.apple.widgetkit-extension
-    dependencies:
-      - target: NekoAlarm
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
