@@ -102,5 +102,16 @@ final class DailyTrackGenerator: ObservableObject {
         } catch { status = "曲を再生できませんでした。" }
     }
 
-    enum TrackError: LocalizedError {\n        case server, noTrack\n        var errorDescription: String? {\n            switch self {\n            case .server: return "AI音源サーバーから曲を取得できませんでした。"\n            case .noTrack: return "今日のAI曲がまだ生成されていません。"\n            }\n        }\n    }
+    enum TrackError: LocalizedError {
+        case server, noTrack
+
+        var errorDescription: String? {
+            switch self {
+            case .server:
+                return "AI音源サーバーから曲を取得できませんでした。"
+            case .noTrack:
+                return "今日のAI曲がまだ生成されていません。"
+            }
+        }
+    }
 }
