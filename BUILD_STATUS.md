@@ -1,20 +1,30 @@
 # Build status
 
-## Verified in CI
+## Verified in GitHub Actions
+
+Latest verified run: [NekoAlarm iOS Build #30](https://github.com/yuu966969-pixel/-/actions/runs/43583536615)
+
+Commit: `fc2377a6aac558154e19d7ebfcf1d5165ee0e2db`
 
 - XcodeGen successfully generates `NekoAlarm.xcodeproj`.
-- The iOS Simulator target compiles successfully.
-- The workflow publishes a `NekoAlarm-iOS-Simulator` artifact.
-- The app has an offline procedural WAV fallback. This is original generated audio, not AI-generated music.
-- If `NEKO_AI_AUDIO_ENDPOINT` is configured in the app's Info.plist and the service returns a valid audio response, the app attempts to use that remote track instead.
-- Alarm scheduling is configured to repeat every day of the week and falls back to the system alarm sound when no daily track is available.
+- `Info.plist` passes `plutil -lint`.
+- The iOS Simulator app builds successfully.
+- The app installs and launches on an iPhone Simulator.
+- The iPhone device target builds successfully without code signing.
+- Both CI artifacts upload successfully:
+  - `NekoAlarm-iOS-Simulator`
+  - `NekoAlarm-iOS-Device-Unsigned`
 
-## Not yet verified
+The artifacts are retained for 14 days from the run (created 2026-11-14).
 
-- AlarmKit behavior on a physical iPhone.
-- Background refresh timing. iOS treats background processing as opportunistic; the app cannot guarantee generation at exactly 00:05.
-- A working hosted AI audio service. No endpoint is configured in this repository.
-- Signed iPhone installation, TestFlight, or App Store distribution. The repository does not contain Apple signing credentials or provisioning profiles.
+## Product behavior and limitations
+
+- The offline soundtrack is procedural WAV audio generated on-device. It is original audio, not AI-generated music.
+- AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No endpoint is configured in this repository.
+- Background refresh is opportunistic. iOS does not guarantee execution at exactly 00:05.
+- The app currently schedules a weekly repeating AlarmKit alarm. The sound resource is selected when the alarm is scheduled; automatic replacement of that resource for each subsequent day has not been verified.
 - The password and quiz are app-local practice UI only. They do not gate the system AlarmKit dismiss action.
+- AlarmKit behavior, custom sound playback, and background execution still need physical-iPhone verification.
+- The CI device build is unsigned. It cannot be installed on a physical iPhone until signed with an Apple development identity and provisioning profile.
 
-See [BUILDING.md](BUILDING.md) for build artifacts and signing requirements.
+See [BUILDING.md](BUILDING.md) for artifact download and signing requirements.
