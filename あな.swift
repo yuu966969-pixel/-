@@ -125,7 +125,7 @@ final class DailyTrackGenerator: ObservableObject {
     /// Creates a short, original daily instrumental locally. This is procedural audio, not AI.
     private static func makeDailyWAV(seed date: String) -> Data {
         let sampleRate: UInt32 = 22_050
-        let duration = 12.0
+        let duration = 20.0
         let frameCount = Int(Double(sampleRate) * duration)
         var seed = date.utf8.reduce(UInt32(2_166_136_261)) { ($0 ^ UInt32($1)) &* 16_777_619 }
         func nextRandom() -> UInt32 {
@@ -134,7 +134,7 @@ final class DailyTrackGenerator: ObservableObject {
         }
 
         let scale: [Double] = [0, 3, 5, 7, 10, 12, 15, 17]
-        let melody = (0..<24).map { _ in scale[Int(nextRandom() % UInt32(scale.count))] }
+        let melody = (0..<40).map { _ in scale[Int(nextRandom() % UInt32(scale.count))] }
         var samples = [Int16]()
         samples.reserveCapacity(frameCount)
 
@@ -164,7 +164,7 @@ final class DailyTrackGenerator: ObservableObject {
             }
 
             // Daily randomized pentatonic melody.
-            let semitone = melody[min(23, max(0, beat))]
+            let semitone = melody[min(39, max(0, beat))]
             let frequency = 220.0 * pow(2.0, semitone / 12.0)
             let melodyEnvelope = min(1.0, withinBeat * 18.0) * exp(-withinBeat * 2.8)
             value += sin(2.0 * .pi * frequency * time) * melodyEnvelope * 0.16
