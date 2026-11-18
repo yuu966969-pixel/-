@@ -45,6 +45,34 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             build
 
+      - name: Validate built app metadata
+        run: |
+          python3 - <<'PY'
+          import plistlib
+          path = 'build/SimulatorDerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app/Info.plist'
+          with open(path, 'rb') as stream:
+              info = plistlib.load(stream)
+          required = [
+              'NSAlarmKitUsageDescription',
+              'UIBackgroundModes',
+              'BGTaskSchedulerPermittedIdentifiers',
+              'NSSupportsLiveActivities',
+              'UILaunchStoryboardName',
+          ]
+          missing = [key for key in required if key not in info]
+          if missing:
+              raise SystemExit(f'Missing required Info.plist keys: {missing}')
+          if 'processing' not in info['UIBackgroundModes']:
+              raise SystemExit('BGProcessingTask mode is missing')
+          if 'jp.example.NekoAlarm.dailyTrackRefresh' not in info['BGTaskSchedulerPermittedIdentifiers']:
+              raise SystemExit('BGTaskScheduler identifier is missing')
+          if info.get('UIDeviceFamily') != [1]:
+              raise SystemExit(f'Expected iPhone-only UIDeviceFamily [1], got {info.get("UIDeviceFamily")}')
+          if info.get('UILaunchStoryboardName') != 'LaunchScreen':
+              raise SystemExit('Launch storyboard is not configured')
+          print('Built Info.plist contains all required NekoAlarm settings.')
+          PY
+
       - name: Build unsigned iPhone device app
         run: |
           xcodebuild \

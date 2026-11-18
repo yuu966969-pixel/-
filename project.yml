@@ -8,7 +8,6 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
-    TARGETED_DEVICE_FAMILY: "1"
 
 targets:
   NekoAlarm:
@@ -22,9 +21,9 @@ targets:
       - path: NekoAlarmMetadata.swift
     resources:
       - path: LaunchScreen.storyboard
-    info:
-      path: Info.plist
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
         INFOPLIST_FILE: Info.plist
+        GENERATE_INFOPLIST_FILE: NO
+        TARGETED_DEVICE_FAMILY: "1"
