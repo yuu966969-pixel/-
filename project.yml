@@ -20,7 +20,8 @@ targets:
       - path: うお.swift
       - path: あな.swift
       - path: NekoAlarmMetadata.swift
-      - path: Assets.xcassets
+    resources:
+      - path: LaunchScreen.storyboard
     info:
       path: Info.plist
     settings:
