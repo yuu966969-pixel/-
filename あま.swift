@@ -73,7 +73,7 @@ enum NekoBackgroundRefresh {
         task.expirationHandler = { work.cancel() }
         Task {
             await work.value
-            task.setTaskCompleted(success: !Task.isCancelled)
+            task.setTaskCompleted(success: !work.isCancelled)
         }
     }
 }
