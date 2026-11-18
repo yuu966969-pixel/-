@@ -21,9 +21,22 @@ targets:
       - path: NekoAlarmMetadata.swift
     resources:
       - path: LaunchScreen.storyboard
+    info:
+      path: Info.plist
+      properties:
+        NSAlarmKitUsageDescription: "指定した時刻にアラームを鳴らすために使用します。"
+        UIBackgroundModes:
+          - processing
+        BGTaskSchedulerPermittedIdentifiers:
+          - jp.example.NekoAlarm.dailyTrackRefresh
+        NSSupportsLiveActivities: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UILaunchStoryboardName: LaunchScreen
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.nekoalarm.app
-        INFOPLIST_FILE: Info.plist
-        GENERATE_INFOPLIST_FILE: NO
         TARGETED_DEVICE_FAMILY: "1"
