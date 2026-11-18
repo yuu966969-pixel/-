@@ -20,6 +20,7 @@ targets:
       - path: うお.swift
       - path: あな.swift
       - path: NekoAlarmMetadata.swift
+      - path: Assets.xcassets
     info:
       path: Info.plist
     settings:
