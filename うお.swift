@@ -5,14 +5,19 @@ import SwiftUI
 import Foundation
 
 enum AlarmScheduler {
+    private static let alarmIDKey = "nekoAlarmScheduledAlarmID"
+    private static let hourKey = "nekoAlarmHour"
+    private static let minuteKey = "nekoAlarmMinute"
+    private static let scheduledSoundDateKey = "nekoAlarmScheduledSoundDate"
+
     static func schedule(hour: Int, minute: Int, soundResourceName: String?) async throws -> UUID {
         let manager = AlarmManager.shared
-
         let authorization = try await manager.requestAuthorization()
         guard authorization == .authorized else {
             throw AlarmSetupError.notAuthorized
         }
 
+        let oldID = UserDefaults.standard.string(forKey: alarmIDKey).flatMap(UUID.init(uuidString:))
         let id = UUID()
         let alert = AlarmPresentation.Alert(title: "🐱 猫ミーム地獄アラーム")
         let attributes = AlarmAttributes<NekoAlarmMetadata>(
@@ -25,11 +30,7 @@ enum AlarmScheduler {
         let everyDay = Alarm.Schedule.Relative.Recurrence.weekly([
             .monday, .tuesday, .wednesday, .thursday, .friday, .saturday, .sunday
         ])
-        let schedule = Alarm.Schedule.relative(
-            .init(time: time, repeats: everyDay)
-        )
-
-        // Use the generated daily track when available; otherwise use the system alarm sound.
+        let schedule = Alarm.Schedule.relative(.init(time: time, repeats: everyDay))
         let sound = soundResourceName.map { AlertConfiguration.AlertSound.named($0) } ?? .default
         let configuration = AlarmManager.AlarmConfiguration<NekoAlarmMetadata>(
             countdownDuration: nil,
@@ -39,11 +40,39 @@ enum AlarmScheduler {
             sound: sound
         )
 
+        // Schedule the replacement first so a failed update doesn't erase the existing alarm.
         try await manager.schedule(id: id, configuration: configuration)
+        if let oldID, oldID != id {
+            try? manager.cancel(id: oldID)
+        }
+        let defaults = UserDefaults.standard
+        defaults.set(id.uuidString, forKey: alarmIDKey)
+        defaults.set(hour, forKey: hourKey)
+        defaults.set(minute, forKey: minuteKey)
+        defaults.set(soundResourceName == nil ? "" : DailyTrackGenerator.shared.todayKey,
+                     forKey: scheduledSoundDateKey)
         return id
     }
-}
 
+    /// Replaces the repeating alarm after a new daily track is ready.
+    /// iOS background execution is opportunistic, so the existing alarm remains active if refresh is delayed.
+    static func refreshSavedAlarm() async {
+        let defaults = UserDefaults.standard
+        guard defaults.string(forKey: alarmIDKey) != nil,
+              DailyTrackGenerator.shared.hasTrackForToday,
+              defaults.string(forKey: scheduledSoundDateKey) != DailyTrackGenerator.shared.todayKey,
+              let soundName = try? DailyTrackGenerator.shared.prepareAlarmSound() else {
+            return
+        }
+        let hour = defaults.object(forKey: hourKey) == nil ? 7 : defaults.integer(forKey: hourKey)
+        let minute = defaults.object(forKey: minuteKey) == nil ? 0 : defaults.integer(forKey: minuteKey)
+        do {
+            _ = try await schedule(hour: hour, minute: minute, soundResourceName: soundName)
+        } catch {
+            // Keep the existing alarm active; the next refresh can retry.
+        }
+    }
+}
 enum AlarmSetupError: LocalizedError {
     case notAuthorized
 

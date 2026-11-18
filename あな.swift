@@ -38,9 +38,7 @@ final class DailyTrackGenerator: ObservableObject {
     }
 
     private var currentTrackURL: URL? {
-        if FileManager.default.fileExists(atPath: remoteTrackURL.path) { return remoteTrackURL }
-        if FileManager.default.fileExists(atPath: localTrackURL.path) { return localTrackURL }
-        return nil
+        FileManager.default.fileExists(atPath: localTrackURL.path) ? localTrackURL : nil
     }
 
     var hasTrackForToday: Bool {
@@ -97,10 +95,14 @@ final class DailyTrackGenerator: ObservableObject {
                     throw TrackError.server
                 }
                 try data.write(to: remoteTrackURL, options: .atomic)
+                try convertToAlarmWAV(source: remoteTrackURL, destination: localTrackURL)
+                try? FileManager.default.removeItem(at: remoteTrackURL)
                 saveTrackDate()
                 status = "今日のAI曲が完成！"
                 return
             } catch {
+                try? FileManager.default.removeItem(at: remoteTrackURL)
+                try? FileManager.default.removeItem(at: localTrackURL)
                 // Keep the alarm usable offline if the optional AI service is unavailable.
             }
         }
@@ -117,9 +119,41 @@ final class DailyTrackGenerator: ObservableObject {
         }
     }
 
+    private func convertToAlarmWAV(source: URL, destination: URL) throws {
+        let input = try AVAudioFile(forReading: source)
+        let format = input.processingFormat
+        let maximumFrames = Int64(format.sampleRate * 30.0)
+        guard input.length > 0, input.length <= maximumFrames else {
+            throw TrackError.invalidAudio
+        }
+        let frameCapacity = AVAudioFrameCount(input.length)
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCapacity) else {
+            throw TrackError.invalidAudio
+        }
+        try input.read(into: buffer)
+
+        let wavSettings: [String: Any] = [
+            AVFormatIDKey: kAudioFormatLinearPCM,
+            AVSampleRateKey: format.sampleRate,
+            AVNumberOfChannelsKey: format.channelCount,
+            AVLinearPCMBitDepthKey: 16,
+            AVLinearPCMIsBigEndianKey: false,
+            AVLinearPCMIsFloatKey: false
+        ]
+        let output = try AVAudioFile(forWriting: destination, settings: wavSettings)
+        try output.write(from: buffer)
+    }
+
     private func saveTrackDate() {
         trackDate = todayKey
         UserDefaults.standard.set(todayKey, forKey: defaultsKey)
+        let files = (try? FileManager.default.contentsOfDirectory(
+            at: folderURL, includingPropertiesForKeys: nil
+        )) ?? []
+        for file in files where file.lastPathComponent.hasPrefix("daily-")
+            && file.lastPathComponent != localTrackURL.lastPathComponent {
+            try? FileManager.default.removeItem(at: file)
+        }
     }
 
     /// Creates a short, original daily instrumental locally. This is procedural audio, not AI.
@@ -224,7 +258,7 @@ final class DailyTrackGenerator: ObservableObject {
     }
 
     enum TrackError: LocalizedError {
-        case server, noTrack
+        case server, noTrack, invalidAudio
 
         var errorDescription: String? {
             switch self {
@@ -232,6 +266,8 @@ final class DailyTrackGenerator: ObservableObject {
                 return "AI音源サーバーから曲を取得できませんでした。"
             case .noTrack:
                 return "今日の曲がまだ生成されていません。"
+            case .invalidAudio:
+                return "音源の形式または長さが対応範囲外です。"
             }
         }
     }

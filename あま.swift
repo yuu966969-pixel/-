@@ -11,6 +11,7 @@ struct NekoAlarmApp: App {
             ContentView()
                 .task {
                     await DailyTrackGenerator.shared.generateIfNeeded()
+                    await AlarmScheduler.refreshSavedAlarm()
                     NekoBackgroundRefresh.scheduleNext()
                     await watchForMidnightWhileForegrounded()
                 }
@@ -28,6 +29,7 @@ struct NekoAlarmApp: App {
             do {
                 try await Task.sleep(for: .seconds(seconds))
                 await DailyTrackGenerator.shared.generateIfNeeded()
+                await AlarmScheduler.refreshSavedAlarm()
                 NekoBackgroundRefresh.scheduleNext()
             } catch {
                 return
@@ -69,6 +71,7 @@ enum NekoBackgroundRefresh {
         scheduleNext()
         let work = Task { @MainActor in
             await DailyTrackGenerator.shared.generateIfNeeded()
+            await AlarmScheduler.refreshSavedAlarm()
         }
         task.expirationHandler = { work.cancel() }
         Task {

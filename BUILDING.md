@@ -25,5 +25,7 @@ To install on a physical iPhone, configure a valid Apple development team, bundl
 - The daily offline soundtrack is procedural audio generated on-device. It is not AI music.
 - AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No such service is configured in this repository.
 - iOS background refresh is opportunistic and cannot guarantee execution at an exact time.
-- The password and quiz screens are app-local demonstrations. They do not prevent dismissal of the system AlarmKit alarm.
-- Physical-device AlarmKit behavior still needs to be tested on an iPhone.
+- The AlarmKit stop intent opens the app and starts the in-app password/quiz flow after the system alarm has stopped. It cannot block the system's stop action.
+- The selected alarm time is persisted. When a new daily track is ready, the app replaces its repeating alarm with a new configuration using the latest sound. This is best-effort because iOS background processing is opportunistic.
+- Downloaded MP3 audio is converted to PCM WAV before AlarmKit uses it; the offline fallback is also WAV.
+- Physical-device AlarmKit behavior, custom sound playback, stop-intent foregrounding, and background execution still need to be tested on an iPhone.

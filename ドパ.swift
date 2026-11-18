@@ -6,6 +6,8 @@ struct ContentView: View {
     @AppStorage("nekoAlarmChallengePending") private var challengePending = false
     @StateObject private var dailyTrack = DailyTrackGenerator.shared
     @AppStorage("nekoAlarmPasswordHash") private var passwordHash = ""
+    @AppStorage("nekoAlarmHour") private var savedAlarmHour = 7
+    @AppStorage("nekoAlarmMinute") private var savedAlarmMinute = 0
     @State private var alarmTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: .now) ?? .now
     @State private var newPassword = ""
     @State private var enteredPassword = ""
@@ -177,7 +179,21 @@ struct ContentView: View {
             }
             .navigationTitle("Neko Alarm")
         }
-        .onAppear { handleAlarmStopIfNeeded() }
+        .onAppear {
+            var components = Calendar.current.dateComponents([.year, .month, .day], from: .now)
+            components.hour = savedAlarmHour
+            components.minute = savedAlarmMinute
+            alarmTime = Calendar.current.date(from: components) ?? alarmTime
+            handleAlarmStopIfNeeded()
+        }
+        .onChange(of: alarmTime) { _, value in
+            let components = Calendar.current.dateComponents([.hour, .minute], from: value)
+            savedAlarmHour = components.hour ?? 7
+            savedAlarmMinute = components.minute ?? 0
+        }
+        .onChange(of: challengePending) { _, pending in
+            if pending { handleAlarmStopIfNeeded() }
+        }
         .onChange(of: scenePhase) { _, phase in
             if phase == .active { handleAlarmStopIfNeeded() }
         }
@@ -191,6 +207,10 @@ struct ContentView: View {
         quizIndex = 0
         enteredPassword = ""
         message = "アラームを停止しました。起床チェックに進んでください。"
+        Task {
+            await dailyTrack.generateIfNeeded()
+            await AlarmScheduler.refreshSavedAlarm()
+        }
     }
 
     private static func hash(_ value: String) -> String {

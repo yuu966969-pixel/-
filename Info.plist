@@ -4,6 +4,10 @@
 <dict>
     <key>NSAlarmKitUsageDescription</key>
     <string>指定した時刻にアラームを鳴らすために使用します。</string>
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>processing</string>
+    </array>
     <key>BGTaskSchedulerPermittedIdentifiers</key>
     <array>
         <string>jp.example.NekoAlarm.dailyTrackRefresh</string>
