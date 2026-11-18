@@ -13,8 +13,9 @@ Open the repository's **Actions** tab, select a successful **NekoAlarm iOS Build
 
 1. Install Xcode with an iOS 26.1 SDK and XcodeGen.
 2. Run `xcodegen generate` from the repository root.
-3. Open `NekoAlarm.xcodeproj` in Xcode.
-4. Select an iOS Simulator destination and build.
+3. The generated `Info.plist` is defined by the `info.properties` section in `project.yml`. Change runtime metadata there; do not hand-edit the generated plist because XcodeGen rewrites it.
+4. Open `NekoAlarm.xcodeproj` in Xcode.
+5. Select an iOS Simulator destination and build.
 
 ## Physical iPhone
 
@@ -25,7 +26,7 @@ To install on a physical iPhone, configure a valid Apple development team, bundl
 - The daily offline soundtrack is procedural audio generated on-device. It is not AI music.
 - AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No such service is configured in this repository.
 - iOS background refresh is opportunistic and cannot guarantee execution at an exact time.
-- The AlarmKit stop intent opens the app and starts the in-app password/quiz flow after the system alarm has stopped. It cannot block the system's stop action.
+- The AlarmKit stop intent opens the app after the system has stopped the alarm so the user can complete the optional in-app wake-up check. It cannot block the system's stop action.
 - The selected alarm time is persisted. When a new daily track is ready, the app replaces its repeating alarm with a new configuration using the latest sound. This is best-effort because iOS background processing is opportunistic.
-- Downloaded MP3 audio is converted to PCM WAV before AlarmKit uses it; the offline fallback is also WAV.
+- Downloaded MP3 audio is converted to Int16 PCM WAV before AlarmKit uses it; the offline fallback is also WAV.
 - Physical-device AlarmKit behavior, custom sound playback, stop-intent foregrounding, and background execution still need to be tested on an iPhone.

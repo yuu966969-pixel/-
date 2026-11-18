@@ -2,23 +2,24 @@
 
 ## Latest verified GitHub Actions run
 
-Latest verified run: [NekoAlarm iOS Build #46](https://github.com/yuu966969-pixel/-/actions/runs/44286645987)
+Latest verified run: [NekoAlarm iOS Build #52](https://github.com/yuu966969-pixel/-/actions/runs/44289681691)
 
-Verified commit: `57d6161dab7a688b898819c59a0712b44e1e575c`
+Verified commit: `04b7907351c4407c3dd195a562367599cd432a8e`
 
-The following checks completed successfully:
+All of these checks completed successfully:
 
-- XcodeGen successfully generates `NekoAlarm.xcodeproj`.
-- `Info.plist` passes `plutil -lint`.
+- XcodeGen generates `NekoAlarm.xcodeproj`.
+- `plutil -lint Info.plist` passes after project generation.
 - The iOS Simulator app compiles successfully.
+- The built app's Info.plist is checked for AlarmKit permission text, background processing, the permitted BG task identifier, Live Activities, launch storyboard, and iPhone-only device family.
 - The unsigned iPhone device app compiles successfully.
 - Both CI artifacts upload successfully:
   - `NekoAlarm-iOS-Simulator`
   - `NekoAlarm-iOS-Device-Unsigned`
 
-Artifacts from run #46 expire on 2026-12-02.
+Artifacts from run #52 expire on 2026-12-02.
 
-The simulator installation/launch smoke-test step was removed because the hosted simulator boot stalled. Therefore this run verifies compilation and artifact creation, but does not verify simulator launch. An earlier version of the app installed and launched successfully in simulator in [run #30](https://github.com/yuu966969-pixel/-/actions/runs/43583536615).
+The simulator app is compiled but the hosted simulator boot/launch smoke test is currently omitted because the simulator boot stalled in CI. An earlier version installed and launched successfully in [run #30](https://github.com/yuu966969-pixel/-/actions/runs/43583536615). The current source has not yet had its simulator UI launch verified.
 
 ## Product behavior and limitations
 
