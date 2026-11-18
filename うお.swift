@@ -4,6 +4,7 @@ import ActivityKit
 import SwiftUI
 import Foundation
 
+@MainActor
 enum AlarmScheduler {
     private static let alarmIDKey = "nekoAlarmScheduledAlarmID"
     private static let hourKey = "nekoAlarmHour"
@@ -41,7 +42,7 @@ enum AlarmScheduler {
         )
 
         // Schedule the replacement first so a failed update doesn't erase the existing alarm.
-        try await manager.schedule(id: id, configuration: configuration)
+        _ = try await manager.schedule(id: id, configuration: configuration)
         if let oldID, oldID != id {
             do {
                 try manager.cancel(id: oldID)
