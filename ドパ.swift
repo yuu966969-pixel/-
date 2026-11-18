@@ -2,6 +2,8 @@ import SwiftUI
 import CryptoKit
 
 struct ContentView: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @AppStorage("nekoAlarmChallengePending") private var challengePending = false
     @StateObject private var dailyTrack = DailyTrackGenerator.shared
     @AppStorage("nekoAlarmPasswordHash") private var passwordHash = ""
     @State private var alarmTime = Calendar.current.date(bySettingHour: 7, minute: 0, second: 0, of: .now) ?? .now
@@ -109,7 +111,7 @@ struct ContentView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.pink)
 
-                    GroupBox("④ アプリ内の解除テスト") {
+                    GroupBox("④ アラーム停止後の起床チェック（アプリ内）") {
                         VStack(alignment: .leading, spacing: 12) {
                             SecureField("保存したパスワードを入力", text: $enteredPassword)
                                 .textFieldStyle(.roundedBorder)
@@ -152,7 +154,7 @@ struct ContentView: View {
                                         .foregroundStyle(.green)
                                 }
                             } else {
-                                Text("パスワードを確認するとクイズが表示されます。")
+                                Text("パスワードを確認するとクイズが表示されます。アラームのシステム停止そのものをブロックする機能ではありません。")
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
@@ -175,6 +177,20 @@ struct ContentView: View {
             }
             .navigationTitle("Neko Alarm")
         }
+        .onAppear { handleAlarmStopIfNeeded() }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .active { handleAlarmStopIfNeeded() }
+        }
+    }
+
+    private func handleAlarmStopIfNeeded() {
+        guard challengePending else { return }
+        challengePending = false
+        passwordPassed = false
+        quizPassed = false
+        quizIndex = 0
+        enteredPassword = ""
+        message = "アラームを停止しました。起床チェックに進んでください。"
     }
 
     private static func hash(_ value: String) -> String {
