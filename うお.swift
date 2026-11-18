@@ -1,4 +1,5 @@
 import AlarmKit
+import AppIntents
 import ActivityKit
 import SwiftUI
 import Foundation
@@ -34,6 +35,7 @@ enum AlarmScheduler {
             countdownDuration: nil,
             schedule: schedule,
             attributes: attributes,
+            stopIntent: NekoAlarmStopIntent(),
             sound: sound
         )
 
@@ -50,5 +52,18 @@ enum AlarmSetupError: LocalizedError {
         case .notAuthorized:
             return "アラームの使用が許可されませんでした。iPhoneの設定を確認してください。"
         }
+    }
+}
+
+
+/// Opens the app after the system has stopped the alarm so the user can complete
+/// the optional in-app wake-up check. AlarmKit still stops the alarm immediately.
+struct NekoAlarmStopIntent: LiveActivityIntent {
+    static let title: LocalizedStringResource = "起床チェックを開く"
+    static var supportedModes: IntentModes { .foreground(.immediate) }
+
+    func perform() async throws -> some IntentResult {
+        UserDefaults.standard.set(true, forKey: "nekoAlarmChallengePending")
+        return .result()
     }
 }
