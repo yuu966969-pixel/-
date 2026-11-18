@@ -23,7 +23,7 @@ The artifacts are retained for 14 days from the run (created 2026-11-14).
 - AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No endpoint is configured in this repository.
 - Background refresh is opportunistic. iOS does not guarantee execution at exactly 00:05.
 - The app currently schedules a weekly repeating AlarmKit alarm. The sound resource is selected when the alarm is scheduled; automatic replacement of that resource for each subsequent day has not been verified.
-- The password and quiz are app-local practice UI only. They do not gate the system AlarmKit dismiss action.
+- The AlarmKit stop action still stops the system alarm immediately. Its `stopIntent` opens the app and presents the optional in-app password/quiz wake-up check afterward; it cannot block or reverse the system dismissal.
 - AlarmKit behavior, custom sound playback, and background execution still need physical-iPhone verification.
 - The CI device build is unsigned. It cannot be installed on a physical iPhone until signed with an Apple development identity and provisioning profile.
 
