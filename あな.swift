@@ -54,9 +54,9 @@ final class DailyTrackGenerator: ObservableObject {
         try FileManager.default.createDirectory(at: sounds, withIntermediateDirectories: true)
         let resourceName = "neko-daily-\(todayKey)"
         let destination = sounds.appendingPathComponent(resourceName + "." + source.pathExtension)
-        if !FileManager.default.fileExists(atPath: destination.path) {
-            try FileManager.default.copyItem(at: source, to: destination)
-        }
+        // Replace atomically so a regenerated track never leaves a stale sound at the same daily path.
+        let audioData = try Data(contentsOf: source)
+        try audioData.write(to: destination, options: .atomic)
         // Include the extension: AlarmKit resolves the complete sound filename.
         return resourceName + "." + source.pathExtension
     }
