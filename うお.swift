@@ -43,7 +43,22 @@ enum AlarmScheduler {
         // Schedule the replacement first so a failed update doesn't erase the existing alarm.
         try await manager.schedule(id: id, configuration: configuration)
         if let oldID, oldID != id {
-            try? manager.cancel(id: oldID)
+            do {
+                try manager.cancel(id: oldID)
+            } catch {
+                // Preserve the previous alarm if it could not be replaced cleanly.
+                try? manager.cancel(id: id)
+                throw error
+            }
+
+            // The old alarm is gone, so its daily custom sound can be removed safely.
+            if let oldDate = UserDefaults.standard.string(forKey: scheduledSoundDateKey),
+               !oldDate.isEmpty {
+                let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask)[0]
+                let oldSound = library.appendingPathComponent("Sounds", isDirectory: true)
+                    .appendingPathComponent("neko-daily-\(oldDate).wav")
+                try? FileManager.default.removeItem(at: oldSound)
+            }
         }
         let defaults = UserDefaults.standard
         defaults.set(id.uuidString, forKey: alarmIDKey)
