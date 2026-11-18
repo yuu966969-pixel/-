@@ -46,14 +46,15 @@ jobs:
             build
 
       - name: Install and launch on iPhone Simulator
+        timeout-minutes: 5
         run: |
-          DEVICE_ID="$(xcrun simctl list -j devices available | python3 -c 'import json,sys; data=json.load(sys.stdin); devices=data.get("devices", {}); print(next((d["udid"] for runtime, group in devices.items() if runtime.startswith("com.apple.CoreSimulator.SimRuntime.iOS-") for d in group if d.get("name", "").startswith("iPhone") and d.get("isAvailable", True)), ""))')"
+          DEVICE_ID="$(xcrun simctl list -j devices available | python3 -c 'import json,sys; data=json.load(sys.stdin); devices=data.get("devices", {}); runtimes=sorted((r for r in devices if r.startswith("com.apple.CoreSimulator.SimRuntime.iOS-")), reverse=True); print(next((d["udid"] for runtime in runtimes for d in devices[runtime] if d.get("name", "").startswith("iPhone") and d.get("isAvailable", True)), ""))')"
           if [ -z "$DEVICE_ID" ]; then
             echo 'No available iPhone Simulator device found.'
             xcrun simctl list devices available
             exit 1
           fi
-          echo "Using iPhone Simulator: $DEVICE_ID"
+          echo "Using newest available iPhone Simulator: $DEVICE_ID"
           APP_PATH='build/SimulatorDerivedData/Build/Products/Debug-iphonesimulator/NekoAlarm.app'
           xcrun simctl boot "$DEVICE_ID" || true
           xcrun simctl bootstatus "$DEVICE_ID" -b
