@@ -120,7 +120,14 @@ final class DailyTrackGenerator: ObservableObject {
     }
 
     private func convertToAlarmWAV(source: URL, destination: URL) throws {
-        let input = try AVAudioFile(forReading: source)
+        // Ask AVAudioFile to decode the source into the same Int16 PCM format
+        // used by the destination WAV. This avoids writing a Float32 buffer
+        // into an Int16 file without an explicit format conversion.
+        let input = try AVAudioFile(
+            forReading: source,
+            commonFormat: .pcmFormatInt16,
+            interleaved: false
+        )
         let format = input.processingFormat
         let maximumFrames = Int64(format.sampleRate * 30.0)
         guard input.length > 0, input.length <= maximumFrames else {
@@ -131,6 +138,9 @@ final class DailyTrackGenerator: ObservableObject {
             throw TrackError.invalidAudio
         }
         try input.read(into: buffer)
+        guard buffer.frameLength > 0 else {
+            throw TrackError.invalidAudio
+        }
 
         let wavSettings: [String: Any] = [
             AVFormatIDKey: kAudioFormatLinearPCM,
@@ -140,7 +150,12 @@ final class DailyTrackGenerator: ObservableObject {
             AVLinearPCMIsBigEndianKey: false,
             AVLinearPCMIsFloatKey: false
         ]
-        let output = try AVAudioFile(forWriting: destination, settings: wavSettings)
+        let output = try AVAudioFile(
+            forWriting: destination,
+            settings: wavSettings,
+            commonFormat: .pcmFormatInt16,
+            interleaved: false
+        )
         try output.write(from: buffer)
     }
 
