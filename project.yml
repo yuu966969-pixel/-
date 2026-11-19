@@ -25,6 +25,7 @@ targets:
       path: Info.plist
       properties:
         NSAlarmKitUsageDescription: "指定した時刻にアラームを鳴らすために使用します。"
+        NEKO_AI_AUDIO_ENDPOINT: "$(NEKO_AI_AUDIO_ENDPOINT)"
         UIBackgroundModes:
           - processing
         BGTaskSchedulerPermittedIdentifiers:

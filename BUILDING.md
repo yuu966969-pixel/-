@@ -21,10 +21,14 @@ Open the repository's **Actions** tab, select a successful **NekoAlarm iOS Build
 
 To install on a physical iPhone, configure a valid Apple development team, bundle identifier, signing certificate, and provisioning profile in Xcode or the CI environment. Do not commit signing certificates, private keys, or provisioning profiles to this public repository.
 
+## AI music endpoint
+
+The app reads `NEKO_AI_AUDIO_ENDPOINT` from its generated Info.plist. Set that Xcode build setting to an HTTPS endpoint you control; do not put provider API keys in the iOS app or commit secrets. The endpoint accepts a JSON POST body with `date`, `prompt`, `format: "mp3"`, and `mode` (`daily` or `custom`). It must return the generated MP3 bytes directly with a 2xx response. The app converts the result to a local WAV file so it can be previewed, shared/saved, and used as the AlarmKit sound. For a custom request, `prompt` contains the user's description and the app will not silently substitute a random offline track if AI generation fails.
+
 ## Known product limitations
 
 - The daily offline soundtrack is procedural audio generated on-device. It is not AI music.
-- AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No such service is configured in this repository.
+- AI composition and downloading/sharing are wired into the app, but actual AI generation requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No such service is configured in this repository, so custom AI composition will report that the server is unavailable until one is deployed.
 - iOS background refresh is opportunistic and cannot guarantee execution at an exact time.
 - The AlarmKit stop intent opens the app after the system has stopped the alarm so the user can complete the optional in-app wake-up check. It cannot block the system's stop action.
 - The selected alarm time is persisted. When a new daily track is ready, the app replaces its repeating alarm with a new configuration using the latest sound. This is best-effort because iOS background processing is opportunistic.

@@ -41,6 +41,10 @@ final class DailyTrackGenerator: ObservableObject {
         FileManager.default.fileExists(atPath: localTrackURL.path) ? localTrackURL : nil
     }
 
+    var downloadableTrackURL: URL? {
+        hasTrackForToday ? currentTrackURL : nil
+    }
+
     var hasTrackForToday: Bool {
         trackDate == todayKey && currentTrackURL != nil
     }
@@ -66,15 +70,20 @@ final class DailyTrackGenerator: ObservableObject {
         await generateForToday()
     }
 
-    func generateForToday() async {
+    func generateForToday(prompt requestedPrompt: String? = nil) async {
         guard !isGenerating else { return }
         isGenerating = true
-        status = "今日の曲を生成中…"
+        let customPrompt = requestedPrompt?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let isCustomRequest = customPrompt?.isEmpty == false
+        status = isCustomRequest ? "リクエストに合わせてAI作曲中…" : "今日の曲を生成中…"
         defer { isGenerating = false }
 
         let endpointString = Bundle.main.object(forInfoDictionaryKey: "NEKO_AI_AUDIO_ENDPOINT") as? String
-        if let raw = endpointString, !raw.isEmpty, let endpoint = URL(string: raw) {
-            let prompt = """
+        let configuredEndpoint = endpointString?.trimmingCharacters(in: .whitespacesAndNewlines)
+        if let raw = configuredEndpoint, !raw.isEmpty,
+           let endpoint = URL(string: raw),
+           ["https", "http"].contains(endpoint.scheme?.lowercased() ?? "") {
+            let prompt = customPrompt ?? """
             Create an original, attention-grabbing 20-second alarm instrumental.
             Randomize genre, rhythm, synth timbres and structure each day.
             Use punchy electronic percussion, dramatic bass and surprising sound design.
@@ -87,7 +96,8 @@ final class DailyTrackGenerator: ObservableObject {
                 request.timeoutInterval = 180
                 request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                 request.httpBody = try JSONSerialization.data(withJSONObject: [
-                    "date": todayKey, "prompt": prompt, "format": "mp3"
+                    "date": todayKey, "prompt": prompt, "format": "mp3",
+                    "mode": isCustomRequest ? "custom" : "daily"
                 ])
                 let (data, response) = try await URLSession.shared.data(for: request)
                 guard let http = response as? HTTPURLResponse,
@@ -98,13 +108,20 @@ final class DailyTrackGenerator: ObservableObject {
                 try convertToAlarmWAV(source: remoteTrackURL, destination: localTrackURL)
                 try? FileManager.default.removeItem(at: remoteTrackURL)
                 saveTrackDate()
-                status = "今日のAI曲が完成！"
+                status = isCustomRequest ? "リクエストどおりのAI曲が完成！" : "今日のAI曲が完成！"
                 return
             } catch {
                 try? FileManager.default.removeItem(at: remoteTrackURL)
                 try? FileManager.default.removeItem(at: localTrackURL)
+                if isCustomRequest {
+                    status = "AI作曲に失敗しました。サーバー設定と通信状態を確認してください。"
+                    return
+                }
                 // Keep the alarm usable offline if the optional AI service is unavailable.
             }
+        } else if isCustomRequest {
+            status = "AI作曲サーバーが未設定です。接続設定後にもう一度試してください。"
+            return
         }
 
         do {

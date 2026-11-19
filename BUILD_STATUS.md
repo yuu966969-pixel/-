@@ -24,7 +24,7 @@ The simulator app is compiled but the hosted simulator boot/launch smoke test is
 ## Product behavior and limitations
 
 - The offline soundtrack is procedural WAV audio generated on-device. It is original audio, not AI-generated music.
-- AI music requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`. No endpoint is configured in this repository.
+- The app now accepts free-text composition requests and offers WAV export/share for the generated track. Actual AI generation still requires a separately hosted service configured as `NEKO_AI_AUDIO_ENDPOINT`; no endpoint is configured in this repository.
 - Background refresh is opportunistic. iOS does not guarantee execution at exactly 00:05.
 - The app schedules a weekly repeating AlarmKit alarm and replaces its configuration after a new daily track is ready. This refresh is best-effort because iOS background execution is opportunistic; if the app is not run in time, the previous sound may repeat.
 - The AlarmKit stop action still stops the system alarm immediately. Its `stopIntent` opens the app and presents the optional in-app password/quiz wake-up check afterward; it cannot block or reverse the system dismissal.

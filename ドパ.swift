@@ -12,6 +12,7 @@ struct ContentView: View {
     @State private var newPassword = ""
     @State private var enteredPassword = ""
     @State private var message = ""
+    @State private var customPrompt = ""
     @State private var isSpinning = false
     @State private var quizIndex = 0
     @State private var quizPassed = false
@@ -59,13 +60,45 @@ struct ContentView: View {
                         }
                     }
 
-                    GroupBox("② アラーム時刻") {
+                    GroupBox("② AIに好きな曲を作ってもらう") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            Text("どんな曲にしたいか、自由に書いてね。")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            TextField("例：朝に元気が出る、猫っぽくて明るい電子音楽", text: $customPrompt, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .lineLimit(2...4)
+                                .accessibilityLabel("作曲リクエスト")
+                            Button {
+                                Task { await dailyTrack.generateForToday(prompt: customPrompt) }
+                            } label: {
+                                Label("この内容でAI作曲する", systemImage: "wand.and.stars")
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .disabled(dailyTrack.isGenerating || customPrompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || customPrompt.count > 300)
+                            if customPrompt.count > 300 {
+                                Text("リクエストは300文字以内にしてください。")
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                            }
+                            if let trackURL = dailyTrack.downloadableTrackURL {
+                                ShareLink(item: trackURL) {
+                                    Label("完成した曲を保存・共有", systemImage: "square.and.arrow.down")
+                                }
+                            }
+                            Text("AIサーバーが設定されている場合に作曲できます。完成した音源はWAV形式で保存・共有できます。")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    GroupBox("③ アラーム時刻") {
                         DatePicker("鳴らす時刻", selection: $alarmTime, displayedComponents: .hourAndMinute)
                             .datePickerStyle(.wheel)
                             .labelsHidden()
                     }
 
-                    GroupBox("③ 解除パスワード") {
+                    GroupBox("④ 解除パスワード") {
                         VStack(alignment: .leading, spacing: 10) {
                             SecureField("4文字以上のパスワード", text: $newPassword)
                                 .textFieldStyle(.roundedBorder)
@@ -113,7 +146,7 @@ struct ContentView: View {
                     .buttonStyle(.borderedProminent)
                     .tint(.pink)
 
-                    GroupBox("④ アラーム停止後の起床チェック（アプリ内）") {
+                    GroupBox("⑤ アラーム停止後の起床チェック（アプリ内）") {
                         VStack(alignment: .leading, spacing: 12) {
                             SecureField("保存したパスワードを入力", text: $enteredPassword)
                                 .textFieldStyle(.roundedBorder)
