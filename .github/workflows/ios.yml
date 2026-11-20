@@ -12,6 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  backend-test:
+    name: Test AI music backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install backend dependencies
+        run: python -m pip install -r server/requirements.txt
+      - name: Run backend tests
+        working-directory: server
+        run: python -m unittest discover -s . -p 'test_*.py'
+
   build:
     name: Build and smoke-test NekoAlarm
     runs-on: macos-26-intel
