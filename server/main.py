@@ -85,7 +85,7 @@ async def generate(body: GenerateRequest, request: Request):
 
     try:
         async with httpx.AsyncClient(timeout=httpx.Timeout(160.0, connect=15.0)) as client:
-            upstream = await client.post(STABILITY_URL, headers=headers, data=form, files={"none": (None, b"")})
+            upstream = await client.post(STABILITY_URL, headers=headers, data=form, files={"image": (None, b"")})
     except httpx.TimeoutException:
         raise HTTPException(status_code=504, detail="作曲AIの応答がタイムアウトしました。")
     except httpx.HTTPError:

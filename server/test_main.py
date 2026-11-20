@@ -66,7 +66,7 @@ class MusicAPITests(unittest.TestCase):
         self.assertEqual(kwargs["data"]["model"], "stable-audio-2.5")
         self.assertEqual(kwargs["data"]["duration"], "20")
         self.assertEqual(kwargs["data"]["output_format"], "mp3")
-        self.assertIn("none", kwargs["files"])
+        self.assertIn("image", kwargs["files"])
 
     def test_missing_api_key_returns_503(self):
         with patch.dict(os.environ, {"STABILITY_API_KEY": ""}):
