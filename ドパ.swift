@@ -13,6 +13,7 @@ struct ContentView: View {
     @State private var enteredPassword = ""
     @State private var message = ""
     @State private var customPrompt = ""
+    @AppStorage("nekoAlarmAudioEndpoint") private var audioEndpoint = ""
     @State private var isSpinning = false
     @State private var quizIndex = 0
     @State private var quizPassed = false
@@ -62,6 +63,18 @@ struct ContentView: View {
 
                     GroupBox("② AIに好きな曲を作ってもらう") {
                         VStack(alignment: .leading, spacing: 10) {
+                            Text("AIサーバーURL（HTTPS）")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                            TextField("https://あなたのサーバー.example/api/generate", text: $audioEndpoint)
+                                .textFieldStyle(.roundedBorder)
+                                .keyboardType(.URL)
+                                .textInputAutocapitalization(.never)
+                                .autocorrectionDisabled()
+                                .accessibilityLabel("AI作曲サーバーURL")
+                            Text("APIキーはここに入力しないでください。サーバー側の環境変数で安全に管理します。")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
                             Text("どんな曲にしたいか、自由に書いてね。")
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)

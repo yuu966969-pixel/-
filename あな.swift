@@ -78,11 +78,14 @@ final class DailyTrackGenerator: ObservableObject {
         status = isCustomRequest ? "リクエストに合わせてAI作曲中…" : "今日の曲を生成中…"
         defer { isGenerating = false }
 
-        let endpointString = Bundle.main.object(forInfoDictionaryKey: "NEKO_AI_AUDIO_ENDPOINT") as? String
+        let plistEndpoint = Bundle.main.object(forInfoDictionaryKey: "NEKO_AI_AUDIO_ENDPOINT") as? String
+        let savedEndpoint = UserDefaults.standard.string(forKey: "nekoAlarmAudioEndpoint")
+        let endpointString = savedEndpoint?.isEmpty == false ? savedEndpoint : plistEndpoint
         let configuredEndpoint = endpointString?.trimmingCharacters(in: .whitespacesAndNewlines)
         if let raw = configuredEndpoint, !raw.isEmpty,
            let endpoint = URL(string: raw),
-           ["https", "http"].contains(endpoint.scheme?.lowercased() ?? "") {
+           endpoint.scheme?.lowercased() == "https",
+           endpoint.host != nil {
             let prompt = customPrompt ?? """
             Create an original, attention-grabbing 20-second alarm instrumental.
             Randomize genre, rhythm, synth timbres and structure each day.
@@ -128,7 +131,7 @@ final class DailyTrackGenerator: ObservableObject {
             let wav = Self.makeDailyWAV(seed: todayKey)
             try wav.write(to: localTrackURL, options: .atomic)
             saveTrackDate()
-            status = endpointString == nil || endpointString?.isEmpty == true
+            status = configuredEndpoint == nil || configuredEndpoint?.isEmpty == true
                 ? "AIサーバー未設定。端末内で今日のランダム曲を作成しました。"
                 : "AI生成に接続できなかったため、端末内のランダム曲を作成しました。"
         } catch {

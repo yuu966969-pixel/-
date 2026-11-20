@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: nekoalarm-ai-music
+    runtime: docker
+    plan: free
+    rootDir: server
+    healthCheckPath: /health
+    envVars:
+      - key: STABILITY_API_KEY
+        sync: false
+      - key: STABILITY_MODEL
+        value: stable-audio-2.5
+      - key: AUDIO_DURATION_SECONDS
+        value: "20"
+      - key: RATE_PER_HOUR
+        value: "5"
+      - key: RATE_PER_DAY
+        value: "10"

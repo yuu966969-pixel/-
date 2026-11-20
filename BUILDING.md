@@ -21,6 +21,10 @@ Open the repository's **Actions** tab, select a successful **NekoAlarm iOS Build
 
 To install on a physical iPhone, configure a valid Apple development team, bundle identifier, signing certificate, and provisioning profile in Xcode or the CI environment. Do not commit signing certificates, private keys, or provisioning profiles to this public repository.
 
+## AI music backend
+
+A complete FastAPI backend is included in `server/`. It accepts the existing app request at `POST /api/generate`, calls Stability AI Stable Audio 2.5, and returns MP3 bytes. The app now lets the user set the backend's HTTPS URL in the AI composition section; the URL is stored locally and the provider API key stays on the server. See `server/README.md` for local run and Render Blueprint deployment instructions. Generation uses provider credits; check current pricing and remaining credits before use. A backend source tree is included, but it is not deployed or provisioned with a private API key by this repository change.
+
 ## AI music endpoint
 
 The app reads `NEKO_AI_AUDIO_ENDPOINT` from its generated Info.plist. Set that Xcode build setting to an HTTPS endpoint you control; do not put provider API keys in the iOS app or commit secrets. The endpoint accepts a JSON POST body with `date`, `prompt`, `format: "mp3"`, and `mode` (`daily` or `custom`). It must return the generated MP3 bytes directly with a 2xx response. The app converts the result to a local WAV file so it can be previewed, shared/saved, and used as the AlarmKit sound. For a custom request, `prompt` contains the user's description and the app will not silently substitute a random offline track if AI generation fails.
