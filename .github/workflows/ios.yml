@@ -21,6 +21,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Validate AI backend syntax
+        run: python3 -m py_compile server/main.py
+
       - name: Select Xcode
         run: |
           xcode-select -p
