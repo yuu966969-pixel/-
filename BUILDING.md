@@ -23,7 +23,7 @@ To install on a physical iPhone, configure a valid Apple development team, bundl
 
 ## AI music backend
 
-A complete FastAPI backend is included in `server/`. It accepts the existing app request at `POST /api/generate`, calls Stability AI Stable Audio 2.5, and returns MP3 bytes. The app now lets the user set the backend's HTTPS URL in the AI composition section; the URL is stored locally and the provider API key stays on the server. See `server/README.md` for local run and Render Blueprint deployment instructions. Generation uses provider credits; check current pricing and remaining credits before use. A backend source tree is included, but it is not deployed or provisioned with a private API key by this repository change.
+A complete FastAPI backend is included in `server/`. It accepts the existing app request at `POST /api/generate`, calls Stability AI Stable Audio 2.5, and returns MP3 bytes. The app now lets the user set the backend's HTTPS URL in the AI composition section; the URL is stored locally and the provider API key stays on the server. See `server/README.md` for local run and Render Blueprint deployment instructions. Generation consumes provider credits. Have the account owner review current pricing and limits before enabling it. A backend source tree is included, but it is not deployed or provisioned with a private API key by this repository change.
 
 ## AI music endpoint
 

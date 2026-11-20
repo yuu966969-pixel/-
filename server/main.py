@@ -9,7 +9,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel, Field
 
-STABILITY_URL = "https://api.stability.ai/v2beta/audio/stable-audio/text-to-audio"
+STABILITY_URL = "https://api.stability.ai/v2beta/audio/stable-audio-2/text-to-audio"
 MODEL = os.getenv("STABILITY_MODEL", "stable-audio-2.5")
 DURATION_SECONDS = int(os.getenv("AUDIO_DURATION_SECONDS", "20"))
 MAX_PROMPT_CHARS = 500
@@ -84,8 +84,8 @@ async def generate(body: GenerateRequest, request: Request):
     }
 
     try:
-        async with httpx.AsyncClient(timeout=httpx.Timeout(220.0, connect=15.0)) as client:
-            upstream = await client.post(STABILITY_URL, headers=headers, data=form)
+        async with httpx.AsyncClient(timeout=httpx.Timeout(160.0, connect=15.0)) as client:
+            upstream = await client.post(STABILITY_URL, headers=headers, data=form, files={"none": (None, b"")})
     except httpx.TimeoutException:
         raise HTTPException(status_code=504, detail="作曲AIの応答がタイムアウトしました。")
     except httpx.HTTPError:
