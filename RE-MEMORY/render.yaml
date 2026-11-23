@@ -8,6 +8,8 @@ services:
     buildCommand: cd server && npm install
     startCommand: cd server && npm start
     envVars:
+      - key: AI_PROVIDER
+        value: openai
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_MODEL
