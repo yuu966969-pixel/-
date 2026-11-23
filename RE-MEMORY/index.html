@@ -170,14 +170,33 @@ function openConversation(p){
  const id=p.id,history=conversationHistory[id]||(conversationHistory[id]=[]);
  const greeting=p.kind==='nova'?'接続しました。自由に質問してください。確認できない情報は不明と回答します。':p.kind==='merchant'?'……話があるなら聞こう。取引以外の質問でも構わない。':p.name+'：話したいことがあるの？何でも聞いて。';
  const lines=(history.length?history:[{speaker:p.name,text:greeting}]).slice(-12).map(m=>'<p><strong>'+escapeChat(m.speaker)+'：</strong>'+escapeChat(m.text)+'</p>').join('');
- systemMenu(p.name+'との会話','<p class="small">'+escapeChat(p.role||'')+' / '+escapeChat(p.personality||'')+'</p><div style="max-height:38vh;overflow:auto;border:1px solid #49616a66;padding:8px;background:#080e13">'+lines+'</div><form id="freeChatForm"><input id="freeChatInput" style="width:100%;padding:11px;margin-top:10px;background:#101b22;color:#eaf4f1;border:1px solid #66838a" maxlength="240" autocomplete="off" placeholder="自由に話しかける"><button class="menuitem" type="submit">Enter — 送信</button></form><p class="small">自由入力・最大240文字。会話履歴はセーブデータに保存されます。</p>',()=>{
-  const form=document.getElementById('freeChatForm'),input=document.getElementById('freeChatInput');
-  form.onsubmit=e=>{e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q)return;
-   const log=conversationHistory[id]||(conversationHistory[id]=[]);log.push({speaker:'あなた',text:q});
-   log.push({speaker:p.name,text:characterReply(p,q)});
-   if(p.kind==='companion'){const ally=companions.find(x=>x.id===p.id);if(ally){ally.talkCount=(ally.talkCount||0)+1;if(ally.talkCount%4===0)ally.trust=Math.min(100,(ally.trust||0)+1)}}
-   save(false);openConversation(p);
-  };input.focus();
+ systemMenu(p.name+'との会話','<p class="small">'+escapeChat(p.role||'')+' / '+escapeChat(p.personality||'')+'</p><div style="max-height:38vh;overflow:auto;border:1px solid #49616a66;padding:8px;background:#080e13">'+lines+'</div><form id="freeChatForm"><input id="freeChatInput" style="width:100%;padding:11px;margin-top:10px;background:#101b22;color:#eaf4f1;border:1px solid #66838a" maxlength="240" autocomplete="off" placeholder="自由に話しかける"><button class="menuitem" type="submit">Enter — 送信</button></form><p id="chatStatus" class="small">AI接続待機中。メッセージを送ると返答します。</p><p class="small">自由入力・最大240文字。会話履歴はセーブデータに保存されます。</p>',()=>{
+  const form=document.getElementById('freeChatForm'),input=document.getElementById('freeChatInput'),status=document.getElementById('chatStatus'),button=form.querySelector('button');
+  form.onsubmit=async e=>{
+   e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q||button.disabled)return;
+   button.disabled=true;input.disabled=true;status.textContent='AIが返答を考えています……';
+   const log=conversationHistory[id]||(conversationHistory[id]=[]);
+   const ally=p.kind==='companion'?companions.find(x=>x.id===p.id):null;
+   const payload={
+    characterId:p.id,characterName:p.name,kind:p.kind,role:p.role||'',personality:p.personality||'',message:q,
+    history:log.slice(-10).map(m=>({role:m.speaker==='あなた'?'user':'assistant',content:m.text})),
+    context:{trust:ally?.trust??null,level:ally?.level??null,novaTone:novaTone,playerLevel:playerLevel,merchantTrades:merchantTrades}
+   };
+   try{
+    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const data=await response.json().catch(()=>({}));
+    if(!response.ok)throw new Error(data.error||'AIサーバーからエラーが返されました。');
+    if(typeof data.reply!=='string'||!data.reply.trim())throw new Error('AIから空の返答が届きました。');
+    log.push({speaker:'あなた',text:q},{speaker:p.name,text:data.reply.trim()});
+    if(p.kind==='companion'&&ally){ally.talkCount=(ally.talkCount||0)+1;if(ally.talkCount%4===0)ally.trust=Math.min(100,(ally.trust||0)+1)}
+    if(p.kind==='nova')novaGrowth++;
+    save(false);openConversation(p);
+   }catch(err){
+    status.textContent='AI接続エラー：'+(err.message||'サーバーに接続できません。')+' / サーバー設定後、もう一度送信してください。';
+    button.disabled=false;input.disabled=false;input.focus();
+   }
+  };
+  input.focus();
  });
 }
 function openMemory(){const rows=memories.map((m,i)=>'<p>'+(i+1)+'. '+m.name+' — エネルギー '+m.value+' / '+(m.available?'保持中':'貸出中・喪失')+'</p>').join('')||'<p>利用可能な記憶はありません。</p>';const loan=companions.length?'<p>ミナから「記憶を貸してほしい」と依頼されています。選択によって信頼関係が変化します。</p><button class="menuitem" id="lendMemory">依頼を承認して記憶を貸す</button><button class="menuitem" id="refuseMemory">依頼を断る</button><button class="menuitem" id="negotiateMemory">条件を交渉する</button><button class="menuitem" id="borrowMemory">仲間の記憶を借りる</button><button class="menuitem" id="returnMemory">貸し借り中の記憶を返却する</button>':'';systemMenu('記憶アーカイブ','<p>記憶を時間エネルギーへ変換できます。使用した記憶は失われ、侵食が増加します。穢れの記憶抽出は通常の2倍の侵食です。</p>'+rows+'<button class="menuitem" id="convertMemory">最も古い保持記憶を変換</button>'+loan+'<p>記憶侵食：'+corruption+'%　貸借状態：'+(borrowedMemory?borrowedMemory.name+'（一時貸借中）':'なし')+'</p>',()=>{document.getElementById('convertMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：変換できる記憶がありません。');return}m.available=false;energy=Math.min(100,energy+m.value);corruption=Math.min(100,corruption+Math.ceil(m.value/3));updateHUD();say('N.O.V.A.：'+m.name+'を時間エネルギーへ変換しました。この記憶は失われました。');save();openMemory()};if(companions.length){document.getElementById('lendMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：貸し出せる記憶がありません。');return}m.available=false;borrowedMemory={direction:'to-companion',name:m.name,id:m.id,value:m.value};say('依頼を承認。'+m.name+'を一時的に貸し出しました。返却されるまで主人公は利用できません。');save();openMemory()};document.getElementById('refuseMemory').onclick=()=>{say('依頼を断りました。ミナは残念そうですが、関係は維持されています。');save();openMemory()};document.getElementById('negotiateMemory').onclick=()=>{credits+=15;say('返却期限と記憶の扱いを交渉。合意したためクレジット15を受け取り、貸出は保留されました。');save();openMemory()};document.getElementById('borrowMemory').onclick=()=>{if(borrowedMemory){say('N.O.V.A.：すでに貸借中の記憶があります。');return}borrowedMemory={direction:'from-companion',name:companions[0].name+'の大切な記憶',id:'companion-memory',value:12};memories.push({id:'loaned-'+Date.now(),name:borrowedMemory.name,value:12,available:true,loaned:true});say(companions[0].name+'から記憶を借りました。返却するまでの一時利用です。');save();openMemory()};document.getElementById('returnMemory').onclick=()=>{if(!borrowedMemory){say('N.O.V.A.：返却する記憶はありません。');return}if(borrowedMemory.direction==='to-companion'){const m=memoriesById(borrowedMemory.id);if(m)m.available=true}else{memories=memories.filter(m=>!m.loaned)}say(borrowedMemory.name+'を返却しました。');borrowedMemory=null;save();openMemory()}}})}
