@@ -12,7 +12,7 @@
 .panel{background:linear-gradient(135deg,#101b22dd,#0a1016dd);border:1px solid #49616a88;border-radius:8px;padding:12px 15px;backdrop-filter:blur(8px)}
 #brand{position:absolute;top:18px;left:20px;letter-spacing:.18em;font-size:12px;color:#9eb7bd}
 #stats{position:absolute;top:48px;left:20px;width:230px;font-size:12px;line-height:1.8}
-#stats strong{color:#e6f1ee;font-size:15px}
+#stats strong{color:#e6f1ee;font-size:15px}#vitals{margin-top:6px;color:#a9c3c2}
 #objective{position:absolute;top:20px;right:20px;width:270px;font-size:12px;line-height:1.7}
 #prompt{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);font-size:13px;white-space:nowrap}
 #log{position:absolute;left:20px;bottom:20px;width:min(480px,calc(100vw - 40px));font-size:12px;line-height:1.7;min-height:70px}
@@ -35,12 +35,12 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
 <div id="game"></div>
 <div id="hud">
  <div id="brand">RE:MEMORY // APURF789</div>
- <div id="stats" class="panel"><strong>CHRONOS FACILITY 07</strong><br>年齢：20　｜　経過時間：8年（本人）<br>時間エネルギー <span id="energy">64</span><br>記憶侵食 <span id="corruption">0</span>%<br>状態：覚醒直後</div>
+ <div id="stats" class="panel"><strong>CHRONOS FACILITY 07</strong><br>年齢：20　｜　経過時間：8年（本人）<br>時間エネルギー <span id="energy">64</span><br>記憶侵食 <span id="corruption">0</span>%<br>状態：覚醒直後<br><span id="vitals">耐久 100 / 100　穢れデータ 0</span></div>
  <div id="objective" class="panel"><strong>現在の目的</strong><br><span id="objectiveText">施設の制御端末を調べる</span><br><span class="small">外部時間：推定・数億年経過</span></div>
  <div id="reticle"></div>
  <div id="prompt" class="panel hidden"></div>
  <div id="log" class="panel">N.O.V.A.：生命反応は検出されません。現在、施設内にいる人間はあなた一人です。</div>
- <div id="controls">移動 <span class="key">W A S D</span>　視点 <span class="key">↑ ↓ ← →</span><br>調べる <span class="key">E</span>　時間操作 <span class="key">Q</span><br>メニュー <span class="key">Tab</span>　決定 <span class="key">Enter</span>　戻る <span class="key">Esc</span></div>
+ <div id="controls">移動 <span class="key">W A S D</span>　視点 <span class="key">↑ ↓ ← →</span><br>調べる <span class="key">E</span>　時間操作 <span class="key">Q</span>　攻撃 <span class="key">F</span><br>捕獲 <span class="key">C</span>　ダッシュ <span class="key">Shift</span><br>メニュー <span class="key">Tab</span>　決定 <span class="key">Enter</span>　戻る <span class="key">Esc</span></div>
 </div>
 <div id="overlay">
  <div id="dialog" class="panel">
@@ -89,25 +89,27 @@ const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1.05,1),mat(0x292b2a));c
 for(let i=0;i<5;i++){let limb=new THREE.Mesh(new THREE.CylinderGeometry(.07,.18,1.5,6),mat(0x393d39));limb.position.set(Math.sin(i*1.25)*.8,.85,Math.cos(i*1.25)*.6);limb.rotation.z=(i%2?-.7:.7);monster.add(limb)}
 const eyes=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),glow);eyes.position.set(0,1.45,.72);monster.add(eyes);
 const marker=new THREE.PointLight(0x65c9b2,2,7);marker.position.set(0,2,0);monster.add(marker);
-let yaw=0,pitch=-.12,energy=64,corruption=0,started=false,menu=false,near=null,slowUntil=0,scan=false,captured=false;
+let yaw=0,pitch=-.12,energy=64,corruption=0,started=false,menu=false,near=null,slowUntil=0,scan=false,captured=false,terminalRead=false,weaponUnlocked=false,health=100,kegareData=0,enemyHP=100,enemyAlert=false,jumpVelocity=0;
 const keys=new Set(),clock=new THREE.Clock();
 const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
 const objective=document.getElementById('objectiveText');
 function say(t){log.textContent=t}
-function updateHUD(){document.getElementById('energy').textContent=energy;document.getElementById('corruption').textContent=corruption}
+function updateHUD(){document.getElementById('energy').textContent=energy;document.getElementById('corruption').textContent=corruption;document.getElementById('vitals').textContent='耐久 '+health+' / 100　穢れデータ '+kegareData+'　捕獲装置 '+(weaponUnlocked?'有':'無')}
 function showPrompt(t){prompt.textContent=t;prompt.classList.remove('hidden')}
 function hidePrompt(){prompt.classList.add('hidden')}
 function interact(){
  if(!started||menu)return;
- if(near==='terminal'){say('N.O.V.A.：記録を復元しました。クロノス計画はエネルギー・医療・災害対策を目的に開始され、後に兵器転用されました。');objective.textContent='施設の外へ出る方法を探す';terminal.material=glow;return}
+ if(near==='terminal'){terminalRead=true;weaponUnlocked=true;energy=Math.min(100,energy+12);updateHUD();say('N.O.V.A.：記録を復元。クロノス計画は平和利用から兵器転用されました。端末の保管庫から旧式の穢れ捕獲ビーコンを回収。');objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';terminal.material=glow;return}
  if(near==='monster'){
-  if(!scan){scan=true;corruption=Math.min(100,corruption+8);updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。時間異常由来の変異体です。接近観察を記録しました。記憶解析には侵食リスクがあります。');objective.textContent='穢れの観察記録を確認する';}
-  else if(!captured){captured=true;say('N.O.V.A.：安全な捕獲手段は未確立です。研究施設と専用装置が必要です。現段階では観察記録のみ保存しました。');objective.textContent='施設の探索を続ける';}
+  if(!scan){scan=true;kegareData+=1;enemyAlert=true;updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。全モンスターは穢れに属します。時間異常由来の変異体です。観察データを取得しました。');objective.textContent='制御端末から捕獲ビーコンを回収する';}
+  else if(captured){say('N.O.V.A.：捕獲済み個体です。基地の穢れ研究施設が稼働すれば詳細解析が可能になります。');}
+  else if(!weaponUnlocked){say('N.O.V.A.：捕獲装置がありません。先に制御端末を調べてください。');}
+  else {say('N.O.V.A.：対象の安定化を確認。Cキーで捕獲ビーコンを使用できます。');}
   return;
  }
  say('N.O.V.A.：周囲に操作可能な対象はありません。');
 }
-function openMenu(){menu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU</div><h2>システムメニュー</h2><p>現在の進行状況は自動保存されています。</p><p>エネルギー：'+energy+'　記憶侵食：'+corruption+'%</p><p>仲間：0人（開始地点に仲間はいません）</p><button id="resume" autofocus>Enter — ゲームに戻る</button><p class="small">Tab または Esc でも戻れます。</p>';document.getElementById('resume').onclick=closeMenu}
+function openMenu(){menu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久：'+health+'/100　時間エネルギー：'+energy+'　記憶侵食：'+corruption+'%</p><p>穢れ観察データ：'+kegareData+'　捕獲：'+(captured?'1体':'未捕獲')+'</p><p>基地：未発見　仲間：0人（開始地点に仲間はいません）</p><p>穢れの記憶抽出は通常の2倍の侵食を伴います。現在の試作版では抽出機能はロックされています。</p><button id="resume" autofocus>Enter — ゲームに戻る</button><p class="small">Tab または Esc でも戻れます。</p>';document.getElementById('resume').onclick=closeMenu}
 function closeMenu(){menu=false;overlay.classList.add('hidden')}
 document.getElementById('start').addEventListener('click',()=>{started=true;overlay.classList.add('hidden');say('N.O.V.A.：覚醒を確認。施設外部の時間経過は数億年単位と推定されます。まず制御端末を調べてください。');});
 addEventListener('keydown',e=>{
@@ -117,6 +119,8 @@ addEventListener('keydown',e=>{
  if(menu)return;
  keys.add(e.key.toLowerCase());
  if(e.key.toLowerCase()==='e')interact();
+ if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0)say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');}
+ if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;energy=Math.min(100,energy+10);updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';}}
  if(e.key.toLowerCase()==='q'&&started&&energy>=8){energy-=8;slowUntil=performance.now()+4200;updateHUD();say('N.O.V.A.：局所時間加速を起動。周囲の時間流量が低下しています。')}
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
@@ -129,15 +133,17 @@ function animate(){
   const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
   let move=new THREE.Vector3();
   if(keys.has('w'))move.add(forward);if(keys.has('s'))move.sub(forward);if(keys.has('d'))move.add(right);if(keys.has('a'))move.sub(right);
-  if(move.lengthSq()>0){move.normalize();player.position.addScaledVector(move,dt*5.2);player.rotation.y=Math.atan2(move.x,move.z)}
+  if(move.lengthSq()>0){move.normalize();move.multiplyScalar(keys.has('shift')?8.2:5.2);player.position.addScaledVector(move,dt);player.rotation.y=Math.atan2(move.x,move.z)}
+  if(keys.has(' ')&&player.position.y<=.001)jumpVelocity=6.2;if(player.position.y>0||jumpVelocity>0){jumpVelocity-=dt*16;player.position.y=Math.max(0,player.position.y+jumpVelocity*dt);if(player.position.y===0)jumpVelocity=0;}
   if(keys.has('arrowleft'))yaw+=dt*1.55;if(keys.has('arrowright'))yaw-=dt*1.55;
   if(keys.has('arrowup'))pitch=Math.max(-.55,pitch-dt*.8);if(keys.has('arrowdown'))pitch=Math.min(.25,pitch+dt*.8);
   near=null;let dT=distance(player,terminal),dM=distance(player,monster);
   if(dT<3.2){near='terminal';showPrompt('[ E ] 制御端末を調べる')}
-  else if(dM<4.5){near='monster';showPrompt('[ E ] 穢れを観察する')}
+  else if(dM<4.5){near='monster';showPrompt(captured?'[ E ] 捕獲済み穢れを確認':(enemyHP<=0?'[ C ] 捕獲　[ E ] 観察':'[ E ] 観察　[ F ] 攻撃'))}
   else hidePrompt();
-  if(performance.now()>slowUntil)monster.rotation.y+=dt*.12;else monster.rotation.y+=dt*.035;
+  if(performance.now()>slowUntil){monster.rotation.y+=dt*.12;if(enemyAlert&&!captured&&enemyHP>0){const toward=player.position.clone().sub(monster.position);toward.y=0;if(toward.length()>2.1){toward.normalize();monster.position.addScaledVector(toward,dt*.75);}}}else monster.rotation.y+=dt*.035;
   monster.position.y=Math.sin(performance.now()*.001)*.08;
+  if(enemyAlert&&!captured&&enemyHP>0&&distance(player,monster)<1.6&&Math.random()<.012){health=Math.max(0,health-5);updateHUD();say('穢れが接近しています。距離を取ってください。耐久 '+health+'/100');if(health===0){health=100;player.position.set(0,0,3);say('N.O.V.A.：緊急退避プロトコルを実行。耐久を回復し、施設入口へ戻しました。');updateHUD();}}
   const camTarget=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z);
   const back=new THREE.Vector3(-Math.sin(yaw)*5.8,2.5,Math.cos(yaw)*5.8);
   camera.position.lerp(camTarget.clone().add(back),1-Math.pow(.001,dt));
@@ -148,8 +154,8 @@ function animate(){
 animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
 const saveKey='rememory-apurf789-save-v1';
-function save(){localStorage.setItem(saveKey,JSON.stringify({energy,corruption,scan,captured,objective:objective.textContent,player:{x:player.position.x,z:player.position.z}}))}
-function load(){try{const s=JSON.parse(localStorage.getItem(saveKey)||'null');if(s){energy=s.energy??64;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;objective.textContent=s.objective||objective.textContent;if(s.player){player.position.x=s.player.x;player.position.z=s.player.z}updateHUD();}}catch{}}
+function save(){localStorage.setItem(saveKey,JSON.stringify({energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z}}))}
+function load(){try{const s=JSON.parse(localStorage.getItem(saveKey)||'null');if(s){energy=s.energy??64;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;objective.textContent=s.objective||objective.textContent;if(s.player){player.position.x=s.player.x;player.position.y=s.player.y??0;player.position.z=s.player.z}updateHUD();}}catch{}}
 load();setInterval(save,3000);addEventListener('beforeunload',save);
 </script>
 </body></html>
