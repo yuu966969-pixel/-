@@ -184,4 +184,5 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(405); res.end("Method not allowed");
 });
 
-server.listen(port, "0.0.0.0", () => console.log("RE:MEMORY server listening on port " + port + " (provider: " + provider + ")"));
+const listenHost = provider === "openai" ? "0.0.0.0" : "127.0.0.1";
+server.listen(port, listenHost, () => console.log("RE:MEMORY server listening on " + listenHost + ":" + port + " (provider: " + provider + ")"));
