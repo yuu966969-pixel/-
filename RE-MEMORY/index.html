@@ -40,7 +40,7 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
  <div id="reticle"></div>
  <div id="prompt" class="panel hidden"></div>
  <div id="log" class="panel">N.O.V.A.：生命反応は検出されません。現在、施設内にいる人間はあなた一人です。</div>
- <div id="controls">移動 <span class="key">W A S D</span>　視点 <span class="key">↑ ↓ ← →</span><br>調べる <span class="key">E</span>　時間操作 <span class="key">Q</span>　攻撃 <span class="key">F</span><br>捕獲 <span class="key">C</span>　ダッシュ <span class="key">Shift</span><br>メニュー <span class="key">Tab</span>　決定 <span class="key">Enter</span>　戻る <span class="key">Esc</span></div>
+ <div id="controls">移動 <span class="key">W A S D</span>　視点 <span class="key">↑ ↓ ← →</span><br>調べる <span class="key">E</span>　時間操作 <span class="key">Q</span>　攻撃 <span class="key">F</span><br>捕獲 <span class="key">C</span>　ダッシュ <span class="key">Shift</span><br>メニュー <span class="key">Tab</span>　手動セーブ <span class="key">F5</span>　決定 <span class="key">Enter</span>　戻る <span class="key">Esc</span></div>
 </div>
 <div id="overlay">
  <div id="dialog" class="panel">
@@ -109,7 +109,7 @@ function interact(){
  }
  say('N.O.V.A.：周囲に操作可能な対象はありません。');
 }
-function openMenu(){menu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久：'+health+'/100　時間エネルギー：'+energy+'　記憶侵食：'+corruption+'%</p><p>穢れ観察データ：'+kegareData+'　捕獲：'+(captured?'1体':'未捕獲')+'</p><p>基地：未発見　仲間：0人（開始地点に仲間はいません）</p><p>穢れの記憶抽出は通常の2倍の侵食を伴います。現在の試作版では抽出機能はロックされています。</p><button id="resume" autofocus>Enter — ゲームに戻る</button><p class="small">Tab または Esc でも戻れます。</p>';document.getElementById('resume').onclick=closeMenu}
+function openMenu(){menu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久：'+health+'/100　時間エネルギー：'+energy+'　記憶侵食：'+corruption+'%</p><p>穢れ観察データ：'+kegareData+'　捕獲：'+(captured?'1体':'未捕獲')+'</p><p>基地：未発見　仲間：0人（開始地点に仲間はいません）</p><p>穢れの記憶抽出は通常の2倍の侵食を伴います。現在の試作版では抽出機能はロックされています。</p><p id="saveStatus" class="small">'+(lastSaveLabel||'セーブデータ未作成')+'</p><button id="saveButton" class="menuitem">S — 手動セーブ</button><button id="resume" class="menuitem" autofocus>Enter — ゲームに戻る</button><p class="small">S：手動セーブ ／ Tab または Esc：戻る</p>';document.getElementById('resume').onclick=closeMenu;document.getElementById('saveButton').onclick=()=>save(true)}
 function closeMenu(){menu=false;researchMenu=false;overlay.classList.add('hidden')}
 function openResearch(){if(!terminalRead){say('N.O.V.A.：研究設備の制御コードがありません。先に制御端末を調べてください。');return}menu=true;researchMenu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">CHRONOS LAB / KEYBOARD CONSOLE</div><h2>簡易研究コンソール</h2><p>1：穢れ記録の解析（観察データ2・エネルギー10）</p><p>2：時間制御の調整（エネルギー15）現在 Lv.'+timeLevel+'</p><p>3：耐久機構の修復（エネルギー10）</p><p>研究段階：'+researchLevel+'　解析：'+(analysisUnlocked?'完了':'未完了')+'</p><p class="small">番号キーで選択。Esc / Tab で戻る。</p>';}
 function researchChoice(n){if(!researchMenu)return;if(n===1){if(!captured){say('N.O.V.A.：解析対象がありません。穢れを捕獲してください。');return}if(kegareData<2||energy<10){say('N.O.V.A.：解析資源が不足しています。穢れデータ2・エネルギー10が必要です。');return}kegareData-=2;energy-=10;analysisUnlocked=true;researchLevel++;corruption=Math.max(0,corruption-4);updateHUD();say('N.O.V.A.：穢れの記憶構造を解析。時間変異への高い反応性を確認。侵食を抑える仮説を記録しました。');save();openResearch();}else if(n===2){if(energy<15){say('N.O.V.A.：エネルギー不足です。');return}energy-=15;timeLevel++;researchLevel++;updateHUD();say('N.O.V.A.：時間制御を調整。局所時間操作の持続時間が延長されました。');save();openResearch();}else if(n===3){if(energy<10){say('N.O.V.A.：エネルギー不足です。');return}energy-=10;health=100;updateHUD();say('N.O.V.A.：耐久機構を修復しました。');save();openResearch();}}
@@ -118,7 +118,8 @@ addEventListener('keydown',e=>{
  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Tab'].includes(e.key))e.preventDefault();
  if(e.key==='Enter'&&!started){document.getElementById('start').click();return}
  if((e.key==='Tab'||e.key==='Escape')&&started){menu?closeMenu():openMenu();return}
- if(menu){if(researchMenu&&['1','2','3'].includes(e.key)){researchChoice(Number(e.key));}return;}
+ if(e.key==='F5'&&started){e.preventDefault();save(true);return}
+ if(menu){if(researchMenu&&['1','2','3'].includes(e.key)){researchChoice(Number(e.key));}else if(!researchMenu&&e.key.toLowerCase()==='s'){save(true);const status=document.getElementById('saveStatus');if(status)status.textContent=lastSaveLabel;}return;}
  keys.add(e.key.toLowerCase());
  if(e.key.toLowerCase()==='e')interact();
  if(e.key.toLowerCase()==='r'&&started&&near==='terminal')openResearch();
@@ -156,9 +157,33 @@ function animate(){
 }
 animate();
 addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
-const saveKey='rememory-apurf789-save-v1';
-function save(){localStorage.setItem(saveKey,JSON.stringify({energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z}}))}
-function load(){try{const s=JSON.parse(localStorage.getItem(saveKey)||'null');if(s){energy=s.energy??64;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;if(s.player){player.position.x=s.player.x;player.position.y=s.player.y??0;player.position.z=s.player.z}updateHUD();}}catch{}}
-load();setInterval(save,3000);addEventListener('beforeunload',save);
+const saveKey='rememory-apurf789-autosave-v2';
+const manualSaveKey='rememory-apurf789-manual-v2';
+const backupKey='rememory-apurf789-backup-v2';
+let lastSaveLabel='';
+function buildSaveData(){return {version:2,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z}}}
+function save(manual=false){
+ try{
+  const data=JSON.stringify(buildSaveData());
+  const previous=localStorage.getItem(saveKey);
+  if(previous){localStorage.setItem(backupKey+'-2',localStorage.getItem(backupKey+'-1')||'');localStorage.setItem(backupKey+'-1',previous)}
+  localStorage.setItem(manual?manualSaveKey:saveKey,data);
+  if(manual)localStorage.setItem(saveKey,data);
+  lastSaveLabel=(manual?'手動セーブ完了':'オートセーブ完了')+'：'+new Date().toLocaleString('ja-JP');
+  if(manual)say('N.O.V.A.：'+lastSaveLabel+'。バックアップも更新しました。');
+  const status=document.getElementById('saveStatus');if(status)status.textContent=lastSaveLabel;
+  return true;
+ }catch(err){lastSaveLabel='セーブ失敗：ブラウザの保存容量を確認してください';say('N.O.V.A.：'+lastSaveLabel);return false}
+}
+function load(){
+ try{
+  const raw=localStorage.getItem(saveKey)||localStorage.getItem(manualSaveKey)||localStorage.getItem(backupKey+'-1');
+  const s=JSON.parse(raw||'null');
+  if(s){energy=s.energy??64;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;if(s.player){player.position.x=s.player.x;player.position.y=s.player.y??0;player.position.z=s.player.z}if(s.savedAt)lastSaveLabel='前回の保存：'+new Date(s.savedAt).toLocaleString('ja-JP');updateHUD();}
+ }catch{say('N.O.V.A.：セーブデータを読み込めませんでした。バックアップを確認してください。')}
+}
+load();
+setInterval(()=>save(false),60000);
+addEventListener('beforeunload',()=>save(false));
 </script>
 </body></html>
