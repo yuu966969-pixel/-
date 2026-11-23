@@ -99,9 +99,9 @@ function showPrompt(t){prompt.textContent=t;prompt.classList.remove('hidden')}
 function hidePrompt(){prompt.classList.add('hidden')}
 function interact(){
  if(!started||menu)return;
- if(near==='terminal'){terminalRead=true;weaponUnlocked=true;energy=Math.min(100,energy+12);updateHUD();say('N.O.V.A.：記録を復元。クロノス計画は平和利用から兵器転用されました。端末の保管庫から旧式の穢れ捕獲ビーコンを回収。');objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';terminal.material=glow;return}
+ if(near==='terminal'){terminalRead=true;weaponUnlocked=true;energy=Math.min(100,energy+12);updateHUD();say('N.O.V.A.：記録を復元。クロノス計画は平和利用から兵器転用されました。端末の保管庫から旧式の穢れ捕獲ビーコンを回収。');objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';terminal.material=glow;save(false);return}
  if(near==='monster'){
-  if(!scan){scan=true;kegareData+=1;enemyAlert=true;updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。全モンスターは穢れに属します。時間異常由来の変異体です。観察データを取得しました。');objective.textContent='制御端末から捕獲ビーコンを回収する';}
+  if(!scan){scan=true;kegareData+=1;enemyAlert=true;updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。全モンスターは穢れに属します。時間異常由来の変異体です。観察データを取得しました。');objective.textContent='制御端末から捕獲ビーコンを回収する';save(false);}
   else if(captured){say('N.O.V.A.：捕獲済み個体です。基地の穢れ研究施設が稼働すれば詳細解析が可能になります。');}
   else if(!weaponUnlocked){say('N.O.V.A.：捕獲装置がありません。先に制御端末を調べてください。');}
   else {say('N.O.V.A.：対象の安定化を確認。Cキーで捕獲ビーコンを使用できます。');}
@@ -123,8 +123,8 @@ addEventListener('keydown',e=>{
  keys.add(e.key.toLowerCase());
  if(e.key.toLowerCase()==='e')interact();
  if(e.key.toLowerCase()==='r'&&started&&near==='terminal')openResearch();
- if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0)say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');}
- if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;energy=Math.min(100,energy+10);updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';}}
+ if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0)say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');save(false);}
+ if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;energy=Math.min(100,energy+10);updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';save(false);}}
  if(e.key.toLowerCase()==='q'&&started&&energy>=8){energy-=8;slowUntil=performance.now()+4200+(timeLevel-1)*1800;updateHUD();say('N.O.V.A.：局所時間加速を起動。周囲の時間流量が低下しています。')}
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
