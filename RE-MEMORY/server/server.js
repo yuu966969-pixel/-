@@ -6,10 +6,13 @@ import { fileURLToPath } from "node:url";
 const here = path.dirname(fileURLToPath(import.meta.url));
 const webRoot = path.resolve(here, "..");
 const port = Number(process.env.PORT || 3000);
-const provider = (process.env.AI_PROVIDER || "ollama").toLowerCase();
+const provider = (process.env.AI_PROVIDER || "cloudflare").toLowerCase();
 const ollamaBase = (process.env.OLLAMA_BASE_URL || "http://127.0.0.1:11434").replace(/\/$/, "");
 const ollamaModel = process.env.OLLAMA_MODEL || "qwen3:4b";
 const openaiModel = process.env.OPENAI_MODEL || "gpt-6-luna";
+const cloudflareAccountId = process.env.CLOUDFLARE_ACCOUNT_ID || "";
+const cloudflareApiToken = process.env.CLOUDFLARE_API_TOKEN || "";
+const cloudflareModel = process.env.CLOUDFLARE_MODEL || "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
 const apiKey = process.env.OPENAI_API_KEY || "";
 const allowedOrigin = process.env.ALLOWED_ORIGIN || "";
 const maxBodyBytes = 20 * 1024;
@@ -96,6 +99,23 @@ async function askOllama(messages) {
   return { reply, model: ollamaModel, provider: "ollama" };
 }
 
+async function askCloudflare(messages) {
+  if (!cloudflareAccountId || !cloudflareApiToken) return { error: "オンラインAIの接続設定がまだ完了していません。", status: 503 };
+  const upstream = await fetch("https://api.cloudflare.com/client/v4/accounts/" + encodeURIComponent(cloudflareAccountId) + "/ai/v1/chat/completions", {
+    method: "POST",
+    headers: { "Authorization": "Bearer " + cloudflareApiToken, "Content-Type": "application/json" },
+    body: JSON.stringify({ model: cloudflareModel, messages, max_tokens: 320, temperature: 0.7 }),
+    signal: AbortSignal.timeout(45_000)
+  });
+  const result = await upstream.json().catch(() => ({}));
+  if (!upstream.ok) {
+    console.error("Cloudflare AI error:", upstream.status, result?.errors?.[0]?.code || "unknown");
+    return { error: upstream.status === 429 ? "オンラインAIの本日の無料利用枠または送信上限に達しました。時間をおいてください。" : "オンラインAIとの接続に失敗しました。", status: upstream.status === 429 ? 429 : 502 };
+  }
+  const reply = result.choices?.[0]?.message?.content?.trim();
+  return reply ? { reply: reply.slice(0, 1600), model: cloudflareModel, provider: "cloudflare" } : { error: "オンラインAIから返答を受け取れませんでした。", status: 502 };
+}
+
 async function askOpenAI(messages, instructions) {
   if (!apiKey) return { error: "OpenAI APIキーがサーバーに設定されていません。", status: 503 };
   const upstream = await fetch("https://api.openai.com/v1/responses", {
@@ -135,9 +155,11 @@ async function handleChat(req, res) {
   const messages = [{ role: "system", content: buildInstructions(profile, body) }, ...history, { role: "user", content: message }];
 
   try {
-    const result = provider === "openai"
-      ? await askOpenAI(messages.slice(1), messages[0].content)
-      : await askOllama(messages);
+    const result = provider === "cloudflare"
+      ? await askCloudflare(messages)
+      : provider === "openai"
+        ? await askOpenAI(messages.slice(1), messages[0].content)
+        : await askOllama(messages);
     if (result.error) return send(res, result.status || 502, { error: result.error });
     return send(res, 200, result);
   } catch (err) {
@@ -170,19 +192,19 @@ const server = http.createServer(async (req, res) => {
     return res.end();
   }
   if (req.method === "GET" && url.pathname === "/api/health") {
-    let aiConfigured = provider === "openai" ? Boolean(apiKey) : false;
+    let aiConfigured = provider === "cloudflare" ? Boolean(cloudflareAccountId && cloudflareApiToken) : provider === "openai" ? Boolean(apiKey) : false;
     if (provider === "ollama") {
       try {
         const ping = await fetch(ollamaBase + "/api/tags", { signal: AbortSignal.timeout(1500) });
         aiConfigured = ping.ok;
       } catch { aiConfigured = false; }
     }
-    return send(res, 200, { ok: true, provider, aiConfigured, model: provider === "openai" ? openaiModel : ollamaModel });
+    return send(res, 200, { ok: true, provider, aiConfigured, model: provider === "cloudflare" ? cloudflareModel : provider === "openai" ? openaiModel : ollamaModel });
   }
   if (req.method === "POST" && url.pathname === "/api/chat") return handleChat(req, res);
   if (req.method === "GET") return serveStatic(req, res, url.pathname);
   res.writeHead(405); res.end("Method not allowed");
 });
 
-const listenHost = provider === "openai" ? "0.0.0.0" : "127.0.0.1";
+const listenHost = provider === "ollama" ? "127.0.0.1" : "0.0.0.0";
 server.listen(port, listenHost, () => console.log("RE:MEMORY server listening on " + listenHost + ":" + port + " (provider: " + provider + ")"));
