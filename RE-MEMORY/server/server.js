@@ -83,7 +83,7 @@ async function askOllama(messages) {
   const upstream = await fetch(ollamaBase + "/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: ollamaModel, messages, stream: false, keep_alive: "5m", options: { temperature: 0.7, num_predict: 320 } }),
+    body: JSON.stringify({ model: ollamaModel, messages, stream: false, think: false, keep_alive: "5m", options: { temperature: 0.7, num_predict: 320 } }),
     signal: AbortSignal.timeout(120_000)
   });
   const result = await upstream.json().catch(() => ({}));
