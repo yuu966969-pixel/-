@@ -46,8 +46,10 @@ function send(res, status, data) {
 
 function allowedRequest(req) {
   const origin = req.headers.origin;
-  if (!origin || !allowedOrigin) return true;
-  return origin === allowedOrigin;
+  if (!origin) return true;
+  if (allowedOrigin) return origin === allowedOrigin;
+  try { return new URL(origin).host === req.headers.host; }
+  catch { return false; }
 }
 
 function rateLimited(req) {
