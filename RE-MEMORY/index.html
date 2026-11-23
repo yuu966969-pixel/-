@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>RE:MEMORY — 忘却の時間</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,"Noto Sans JP",sans-serif;background:#090d12;color:#dce6e9}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden}body{background:#090d12}
+#game{position:fixed;inset:0}canvas{display:block}
+#hud{position:fixed;inset:0;pointer-events:none;text-shadow:0 2px 8px #000}
+.panel{background:linear-gradient(135deg,#101b22dd,#0a1016dd);border:1px solid #49616a88;border-radius:8px;padding:12px 15px;backdrop-filter:blur(8px)}
+#brand{position:absolute;top:18px;left:20px;letter-spacing:.18em;font-size:12px;color:#9eb7bd}
+#stats{position:absolute;top:48px;left:20px;width:230px;font-size:12px;line-height:1.8}
+#stats strong{color:#e6f1ee;font-size:15px}
+#objective{position:absolute;top:20px;right:20px;width:270px;font-size:12px;line-height:1.7}
+#prompt{position:absolute;bottom:112px;left:50%;transform:translateX(-50%);font-size:13px;white-space:nowrap}
+#log{position:absolute;left:20px;bottom:20px;width:min(480px,calc(100vw - 40px));font-size:12px;line-height:1.7;min-height:70px}
+#controls{position:absolute;right:20px;bottom:20px;font-size:11px;line-height:1.8;text-align:right;color:#aabdc1}
+#overlay{position:fixed;inset:0;background:#05090ddd;display:grid;place-items:center;z-index:5}
+#dialog{width:min(620px,calc(100vw - 32px));max-height:80vh;overflow:auto}
+h1{font-size:clamp(24px,5vw,42px);letter-spacing:.12em;margin:0 0 8px}
+h2{font-size:17px;margin:0 0 12px;color:#d9ebe7}
+p{font-size:13px;line-height:1.9;color:#b8c9ca}
+.key{display:inline-block;border:1px solid #6f858b;border-radius:4px;padding:1px 6px;color:#f0f6f4;margin:0 2px}
+button{font:inherit;color:#eaf4f1;background:#17343b;border:1px solid #66838a;border-radius:5px;padding:9px 16px}
+button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
+.menuitem{display:block;width:100%;text-align:left;margin:7px 0}
+.small{font-size:11px;color:#82999e}
+#reticle{position:absolute;left:50%;top:50%;width:5px;height:5px;border:1px solid #d4e6dd;border-radius:50%;opacity:.65}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="game"></div>
+<div id="hud">
+ <div id="brand">RE:MEMORY // APURF789</div>
+ <div id="stats" class="panel"><strong>CHRONOS FACILITY 07</strong><br>年齢：20　｜　経過時間：8年（本人）<br>時間エネルギー <span id="energy">64</span><br>記憶侵食 <span id="corruption">0</span>%<br>状態：覚醒直後</div>
+ <div id="objective" class="panel"><strong>現在の目的</strong><br><span id="objectiveText">施設の制御端末を調べる</span><br><span class="small">外部時間：推定・数億年経過</span></div>
+ <div id="reticle"></div>
+ <div id="prompt" class="panel hidden"></div>
+ <div id="log" class="panel">N.O.V.A.：生命反応は検出されません。現在、施設内にいる人間はあなた一人です。</div>
+ <div id="controls">移動 <span class="key">W A S D</span>　視点 <span class="key">↑ ↓ ← →</span><br>調べる <span class="key">E</span>　時間操作 <span class="key">Q</span><br>メニュー <span class="key">Tab</span>　決定 <span class="key">Enter</span>　戻る <span class="key">Esc</span></div>
+</div>
+<div id="overlay">
+ <div id="dialog" class="panel">
+  <div class="small">A KEYBOARD-ONLY SCI-FI RPG PROTOTYPE</div>
+  <h1>RE:MEMORY</h1><h2>忘却の時間</h2>
+  <p>惑星APURF789。核兵器と時間兵器が衝突した日から、主人公にとって8年。外の世界では数億年が過ぎていた。</p>
+  <p>あなたは20歳になって目覚めた。施設にいるのは、あなたと内部AI N.O.V.A.だけだ。</p>
+  <p class="small">この試作版は探索・端末調査・時間操作・穢れの観察を確認するための初期ビルドです。すべてキーボードで操作します。</p>
+  <button id="start" autofocus>Enter — ゲーム開始</button>
+ </div>
+</div>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+const mount=document.getElementById('game');
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x87949a);scene.fog=new THREE.FogExp2(0x87949a,.018);
+const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,260);
+const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;mount.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xb8c8cc,0x30383a,1.35));
+const sun=new THREE.DirectionalLight(0xffe2c1,2.2);sun.position.set(-28,42,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+const mat=(c,r=.9,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const groundMat=mat(0x4a4e49),stone=mat(0x555b59),dark=mat(0x202a2d),rust=mat(0x725b49),glow= new THREE.MeshStandardMaterial({color:0x79d9c3,emissive:0x1a7867,emissiveIntensity:1.5});
+const floor=new THREE.Mesh(new THREE.PlaneGeometry(220,220),groundMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.08;floor.receiveShadow=true;scene.add(floor);
+function box(x,y,z,sx,sy,sz,material=stone,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
+function cylinder(x,y,z,rt,rb,h,material=stone){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,7),material);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}
+// Cracked, abandoned facility yard and collapsed structures.
+box(0,-.35,-9,34,.7,25,dark);
+for(let i=0;i<13;i++){let x=(Math.random()-.5)*95,z=-18-Math.random()*75;box(x,1+Math.random()*5,z,2+Math.random()*5,3+Math.random()*10,2+Math.random()*5,i%3?stone:rust,Math.random()*.7)}
+for(let i=0;i<38;i++){let x=(Math.random()-.5)*100,z=(Math.random()-.5)*100;if(Math.abs(x)<13&&z>-18&&z<10)continue;let h=.5+Math.random()*3;cylinder(x,h/2-.05,z,.15+Math.random()*.35,.4+Math.random()*.8,h,i%4?stone:rust)}
+// Facility walls, broken roof beams, emergency lights.
+box(0,2.2,-19,28,4,1,dark);box(-14,2,-7,1,4,24,dark);box(14,2,-7,1,4,24,dark);
+for(let i=0;i<6;i++){box(-11+i*4,4.3,-7,.25,.25,22,rust,.08)}
+const terminal=box(0,1.25,-12,1.2,2.5,.5,dark);box(0,2.1,-11.72,.72,.8,.08,glow);
+for(let x of [-12,12]){const lamp=new THREE.PointLight(0x79d9c3,8,12);lamp.position.set(x,3,-12);scene.add(lamp)}
+// Character placeholder: coat, torso, head, visor. Third-person follow camera.
+const player=new THREE.Group();scene.add(player);
+const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.85,5,8),mat(0x27363a));body.position.y=1.05;body.castShadow=true;player.add(body);
+const head=new THREE.Mesh(new THREE.SphereGeometry(.28,12,10),mat(0xc0b5a3));head.position.y=1.88;head.castShadow=true;player.add(head);
+const visor=new THREE.Mesh(new THREE.BoxGeometry(.34,.09,.28),mat(0x182d31,.3,.4));visor.position.set(0,1.9,.19);player.add(visor);
+const pack=new THREE.Mesh(new THREE.BoxGeometry(.48,.55,.22),rust);pack.position.set(0,1.15,-.42);player.add(pack);
+player.position.set(0,0,3);
+const shadow=new THREE.Mesh(new THREE.CircleGeometry(.55,16),new THREE.MeshBasicMaterial({color:0x15191a,transparent:true,opacity:.35}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.015;player.add(shadow);
+// First distant Kegare silhouette, classified as 穢れ.
+const monster=new THREE.Group();scene.add(monster);monster.position.set(7,0,-25);
+const core=new THREE.Mesh(new THREE.IcosahedronGeometry(1.05,1),mat(0x292b2a));core.position.y=1.2;core.scale.set(.8,1.15,.75);core.castShadow=true;monster.add(core);
+for(let i=0;i<5;i++){let limb=new THREE.Mesh(new THREE.CylinderGeometry(.07,.18,1.5,6),mat(0x393d39));limb.position.set(Math.sin(i*1.25)*.8,.85,Math.cos(i*1.25)*.6);limb.rotation.z=(i%2?-.7:.7);monster.add(limb)}
+const eyes=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),glow);eyes.position.set(0,1.45,.72);monster.add(eyes);
+const marker=new THREE.PointLight(0x65c9b2,2,7);marker.position.set(0,2,0);monster.add(marker);
+let yaw=0,pitch=-.12,energy=64,corruption=0,started=false,menu=false,near=null,slowUntil=0,scan=false,captured=false;
+const keys=new Set(),clock=new THREE.Clock();
+const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
+const objective=document.getElementById('objectiveText');
+function say(t){log.textContent=t}
+function updateHUD(){document.getElementById('energy').textContent=energy;document.getElementById('corruption').textContent=corruption}
+function showPrompt(t){prompt.textContent=t;prompt.classList.remove('hidden')}
+function hidePrompt(){prompt.classList.add('hidden')}
+function interact(){
+ if(!started||menu)return;
+ if(near==='terminal'){say('N.O.V.A.：記録を復元しました。クロノス計画はエネルギー・医療・災害対策を目的に開始され、後に兵器転用されました。');objective.textContent='施設の外へ出る方法を探す';terminal.material=glow;return}
+ if(near==='monster'){
+  if(!scan){scan=true;corruption=Math.min(100,corruption+8);updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。時間異常由来の変異体です。接近観察を記録しました。記憶解析には侵食リスクがあります。');objective.textContent='穢れの観察記録を確認する';}
+  else if(!captured){captured=true;say('N.O.V.A.：安全な捕獲手段は未確立です。研究施設と専用装置が必要です。現段階では観察記録のみ保存しました。');objective.textContent='施設の探索を続ける';}
+  return;
+ }
+ say('N.O.V.A.：周囲に操作可能な対象はありません。');
+}
+function openMenu(){menu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU</div><h2>システムメニュー</h2><p>現在の進行状況は自動保存されています。</p><p>エネルギー：'+energy+'　記憶侵食：'+corruption+'%</p><p>仲間：0人（開始地点に仲間はいません）</p><button id="resume" autofocus>Enter — ゲームに戻る</button><p class="small">Tab または Esc でも戻れます。</p>';document.getElementById('resume').onclick=closeMenu}
+function closeMenu(){menu=false;overlay.classList.add('hidden')}
+document.getElementById('start').addEventListener('click',()=>{started=true;overlay.classList.add('hidden');say('N.O.V.A.：覚醒を確認。施設外部の時間経過は数億年単位と推定されます。まず制御端末を調べてください。');});
+addEventListener('keydown',e=>{
+ if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Tab'].includes(e.key))e.preventDefault();
+ if(e.key==='Enter'&&!started){document.getElementById('start').click();return}
+ if((e.key==='Tab'||e.key==='Escape')&&started){menu?closeMenu():openMenu();return}
+ if(menu)return;
+ keys.add(e.key.toLowerCase());
+ if(e.key.toLowerCase()==='e')interact();
+ if(e.key.toLowerCase()==='q'&&started&&energy>=8){energy-=8;slowUntil=performance.now()+4200;updateHUD();say('N.O.V.A.：局所時間加速を起動。周囲の時間流量が低下しています。')}
+});
+addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+addEventListener('blur',()=>keys.clear());
+function distance(a,b){return a.position.distanceTo(b.position)}
+function animate(){
+ requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
+ if(started&&!menu){
+  const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
+  const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
+  let move=new THREE.Vector3();
+  if(keys.has('w'))move.add(forward);if(keys.has('s'))move.sub(forward);if(keys.has('d'))move.add(right);if(keys.has('a'))move.sub(right);
+  if(move.lengthSq()>0){move.normalize();player.position.addScaledVector(move,dt*5.2);player.rotation.y=Math.atan2(move.x,move.z)}
+  if(keys.has('arrowleft'))yaw+=dt*1.55;if(keys.has('arrowright'))yaw-=dt*1.55;
+  if(keys.has('arrowup'))pitch=Math.max(-.55,pitch-dt*.8);if(keys.has('arrowdown'))pitch=Math.min(.25,pitch+dt*.8);
+  near=null;let dT=distance(player,terminal),dM=distance(player,monster);
+  if(dT<3.2){near='terminal';showPrompt('[ E ] 制御端末を調べる')}
+  else if(dM<4.5){near='monster';showPrompt('[ E ] 穢れを観察する')}
+  else hidePrompt();
+  if(performance.now()>slowUntil)monster.rotation.y+=dt*.12;else monster.rotation.y+=dt*.035;
+  monster.position.y=Math.sin(performance.now()*.001)*.08;
+  const camTarget=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z);
+  const back=new THREE.Vector3(-Math.sin(yaw)*5.8,2.5,Math.cos(yaw)*5.8);
+  camera.position.lerp(camTarget.clone().add(back),1-Math.pow(.001,dt));
+  camera.lookAt(camTarget.clone().add(new THREE.Vector3(Math.sin(yaw)*2,pitch*3,-Math.cos(yaw)*2)));
+ }
+ renderer.render(scene,camera);
+}
+animate();
+addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)});
+const saveKey='rememory-apurf789-save-v1';
+function save(){localStorage.setItem(saveKey,JSON.stringify({energy,corruption,scan,captured,objective:objective.textContent,player:{x:player.position.x,z:player.position.z}}))}
+function load(){try{const s=JSON.parse(localStorage.getItem(saveKey)||'null');if(s){energy=s.energy??64;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;objective.textContent=s.objective||objective.textContent;if(s.player){player.position.x=s.player.x;player.position.z=s.player.z}updateHUD();}}catch{}}
+load();setInterval(save,3000);addEventListener('beforeunload',save);
+</script>
+</body></html>
