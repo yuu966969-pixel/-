@@ -110,6 +110,19 @@ const npcHead=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),mat(0xb9a58f));n
 const npcLamp=new THREE.PointLight(0x8bdac8,1.6,8);npcLamp.position.y=2.2;npcMarker.add(npcLamp);
 const baseMarker=new THREE.Group();baseMarker.position.copy(basePos);scene.add(baseMarker);
 box(-22,.8,-43,5,1.6,4,dark);box(-22,1.8,-43,3,.4,3,rust);const baseBeacon=new THREE.Mesh(new THREE.OctahedronGeometry(.8),glow);baseBeacon.position.set(-22,3,-43);baseMarker.add(baseBeacon);
+
+/* Exploration expansion: a drivable salvage rover and modular ruined outpost rooms. */
+let driving=false;
+const rover=new THREE.Group();scene.add(rover);rover.position.set(12,0,-38);
+const roverFrame=new THREE.Mesh(new THREE.BoxGeometry(2.5,.65,3.6),mat(0x343e40,.65,.45));roverFrame.position.y=.85;rover.add(roverFrame);
+const roverCab=new THREE.Mesh(new THREE.BoxGeometry(1.65,.85,1.45),mat(0x536568,.35,.35));roverCab.position.set(0,1.55,-.25);rover.add(roverCab);
+const roverGlass=new THREE.Mesh(new THREE.BoxGeometry(1.35,.42,.06),glow);roverGlass.position.set(0,1.62,.5);rover.add(roverGlass);
+for(const x of [-1.15,1.15])for(const z of [-1.15,1.15]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(.42,.42,.25,12),dark);wheel.rotation.z=Math.PI/2;wheel.position.set(x,.48,z);rover.add(wheel)}
+const roverLight=new THREE.PointLight(0x8bdac8,1.8,9);roverLight.position.set(0,1.5,2);rover.add(roverLight);
+const outpost= new THREE.Group();outpost.position.copy(basePos);scene.add(outpost);
+for(const [x,z,w,d] of [[0,-5,12,.5],[-6,0,.5,10],[6,0,.5,10],[0,5,12,.5]]){const wall=new THREE.Mesh(new THREE.BoxGeometry(w,3,d),dark);wall.position.set(x,1.5,z);outpost.add(wall)}
+for(const [x,z] of [[-3,-2],[3,-2],[-3,2],[3,2]]){const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(1,.9,.8),rust);consoleBox.position.set(x,.5,z);outpost.add(consoleBox)}
+const outpostRoof=new THREE.Mesh(new THREE.BoxGeometry(12,.35,10),stone);outpostRoof.position.y=3.2;outpostRoof.rotation.z=.025;outpost.add(outpostRoof);
 const memoriesById=id=>memories.find(m=>m.id===id);
 function addXP(n){playerXP+=n;while(playerXP>=playerLevel*40){playerXP-=playerLevel*40;playerLevel++;health=100;energy=Math.min(100,energy+8);say('N.O.V.A.：成長を確認。主人公レベル '+playerLevel+'。耐久機構を再調整しました。')}save(false)}
 function systemMenu(title,html,after){menu=true;researchMenu=false;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">RE:MEMORY / SYSTEM</div><h2>'+title+'</h2>'+html+'<button class="menuitem" id="systemBack">Esc / Tab — 戻る</button>';document.getElementById('systemBack').onclick=()=>openMenu();if(after)after();const first=document.querySelector('#dialog button:not(#systemBack),#dialog input');if(first)first.focus()}
@@ -132,6 +145,7 @@ function openMenu(){menu=true;researchMenu=false;overlay.classList.remove('hidde
 
 function interact(){
  if(!started||menu)return;
+ if(near==='vehicle'){driving=!driving;if(driving){player.visible=false;player.position.copy(rover.position);say('N.O.V.A.：回収用ローバーを起動。WASDで走行、矢印キーで進行方向を調整できます。');}else{player.visible=true;player.position.copy(rover.position).add(new THREE.Vector3(2,0,0));say('ローバーから降りました。');}return;}
  if(near==='npc'){if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測'});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);save();}else{say('ミナ：この星の記録を一緒に集めよう。');}return;}
  if(near==='base'){if(!baseUnlocked){baseUnlocked=true;baseLevel=1;storyFlags.base=true;objective.textContent='基地の設備を整え、穢れの記録を解析する';scrap+=10;say('N.O.V.A.：旧観測拠点を確保。司令室と基本保管庫を起動しました。穢れ研究設備は段階的に修復可能です。');save();}else openBase();return;}
  if(near==='terminal'&&terminalRead){openResearch();return;}
@@ -171,18 +185,20 @@ function animate(){
   const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
   let move=new THREE.Vector3();
   if(keys.has('w'))move.add(forward);if(keys.has('s'))move.sub(forward);if(keys.has('d'))move.add(right);if(keys.has('a'))move.sub(right);
-  if(move.lengthSq()>0){move.normalize();move.multiplyScalar(keys.has('shift')?8.2:5.2);player.position.addScaledVector(move,dt);player.rotation.y=Math.atan2(move.x,move.z)}
+  if(move.lengthSq()>0){move.normalize();move.multiplyScalar(driving?(keys.has('shift')?13:8):(keys.has('shift')?8.2:5.2));if(driving){rover.position.addScaledVector(move,dt);rover.rotation.y=Math.atan2(move.x,move.z);player.position.copy(rover.position);}else{player.position.addScaledVector(move,dt);player.rotation.y=Math.atan2(move.x,move.z)}}
   if(keys.has('arrowleft'))yaw+=dt*1.55;if(keys.has('arrowright'))yaw-=dt*1.55;
   if(keys.has('arrowup'))pitch=Math.max(-.55,pitch-dt*.8);if(keys.has('arrowdown'))pitch=Math.min(.25,pitch+dt*.8);
   near=null;let dT=distance(player,terminal),dM=distance(player,monster);
   if(dT<3.2){near='terminal';showPrompt(terminalRead?'[ E ] 研究コンソール':'[ E ] 制御端末を調べる')}
   else if(dM<4.5){near='monster';showPrompt(captured?'[ E ] 捕獲済み穢れを確認':(enemyHP<=0?'[ C ] 捕獲　[ E ] 観察':'[ E ] 観察　[ F ] 攻撃'))}
+  else if(player.position.distanceTo(rover.position)<3.5){near='vehicle';showPrompt(driving?'[ E ] ローバーから降りる':'[ E ] ローバーに乗る')}
   else if(player.position.distanceTo(npcPos)<3.2){near='npc';showPrompt('[ E ] 生存者と話す')}
   else if(player.position.distanceTo(basePos)<4){near='base';showPrompt(baseUnlocked?'[ E ] 基地を管理':'[ E ] 旧観測拠点を確保')}
   else hidePrompt();
   if(performance.now()>slowUntil){monster.rotation.y+=dt*.12;if(enemyAlert&&!captured&&enemyHP>0){const toward=player.position.clone().sub(monster.position);toward.y=0;if(toward.length()>2.1){toward.normalize();monster.position.addScaledVector(toward,dt*.75);}}}else monster.rotation.y+=dt*.035;
   monster.position.y=Math.sin(performance.now()*.001)*.08;
   if(enemyAlert&&!captured&&enemyHP>0&&distance(player,monster)<1.6&&Math.random()<.012){health=Math.max(0,health-5);updateHUD();say('穢れが接近しています。距離を取ってください。耐久 '+health+'/100');if(health===0){health=100;player.position.set(0,0,3);say('N.O.V.A.：緊急退避プロトコルを実行。耐久を回復し、施設入口へ戻しました。');updateHUD();}}
+  if(driving)player.position.copy(rover.position);
   const camTarget=new THREE.Vector3(player.position.x,player.position.y+1.55,player.position.z);
   const back=new THREE.Vector3(-Math.sin(yaw)*5.8,2.5,Math.cos(yaw)*5.8);
   camera.position.lerp(camTarget.clone().add(back),1-Math.pow(.001,dt));
@@ -196,7 +212,7 @@ const saveKey='rememory-apurf789-autosave-v2';
 const manualSaveKey='rememory-apurf789-manual-v2';
 const backupKey='rememory-apurf789-backup-v2';
 let lastSaveLabel='';
-function buildSaveData(){return {version:3,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags}}
+function buildSaveData(){return {version:3,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y}}}
 function save(manual=false){
  try{
   const data=JSON.stringify(buildSaveData());
@@ -216,7 +232,7 @@ function load(){
   try{
    const raw=localStorage.getItem(key);if(!raw)continue;
    const s=JSON.parse(raw);if(!s||![2,3].includes(s.version)||typeof s.energy!=='number'||!s.player||typeof s.player.x!=='number'||typeof s.player.z!=='number')continue;
-   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
+   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;if(s.rover){rover.position.set(s.rover.x,s.rover.y??0,s.rover.z);rover.rotation.y=s.rover.rotation??0}lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
   }catch(err){continue;}
  }
  lastSaveLabel='セーブデータなし';
