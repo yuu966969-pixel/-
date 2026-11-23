@@ -3,6 +3,8 @@ services:
     name: rememory-ai
     runtime: node
     plan: free
+    rootDir: RE-MEMORY
+    healthCheckPath: /api/health
     buildCommand: cd server && npm install
     startCommand: cd server && npm start
     envVars:
