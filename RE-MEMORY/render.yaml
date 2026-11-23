@@ -9,8 +9,10 @@ services:
     startCommand: cd server && npm start
     envVars:
       - key: AI_PROVIDER
-        value: openai
-      - key: OPENAI_API_KEY
+        value: cloudflare
+      - key: CLOUDFLARE_ACCOUNT_ID
         sync: false
-      - key: OPENAI_MODEL
-        value: gpt-6-luna
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_MODEL
+        value: "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
