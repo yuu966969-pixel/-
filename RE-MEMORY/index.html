@@ -118,7 +118,7 @@ addEventListener('keydown',e=>{
  if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Tab'].includes(e.key))e.preventDefault();
  if(e.key==='Enter'&&!started){document.getElementById('start').click();return}
  if((e.key==='Tab'||e.key==='Escape')&&started){menu?closeMenu():openMenu();return}
- if(menu){if(researchMenu&&['1','2','3'].includes(e.key)){researchChoice(Number(e.key));}return;}
+ if(menu){if(researchMenu&&['1','2','3'].includes(e.key)){researchChoice(Number(e.key));}else if(!researchMenu&&['ArrowUp','ArrowDown'].includes(e.key)){const items=[...document.querySelectorAll('#dialog button')];if(items.length){let i=items.indexOf(document.activeElement);if(i<0)i=0;items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();}}else if(!researchMenu&&e.key==='Enter'){const active=document.activeElement;if(active&&active.tagName==='BUTTON')active.click();}return;}
  keys.add(e.key.toLowerCase());
  if(e.key.toLowerCase()==='e')interact();
  if(e.key.toLowerCase()==='r'&&started&&near==='terminal')openResearch();
