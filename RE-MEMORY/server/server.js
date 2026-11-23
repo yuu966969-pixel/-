@@ -159,7 +159,11 @@ async function handleChat(req, res) {
       console.error("OpenAI API error:", upstream.status, result?.error?.type || "unknown");
       return send(res, 502, { error: "AIとの接続に失敗しました。少し待ってからもう一度話しかけてください。" });
     }
-    const answer = typeof result.output_text === "string" ? result.output_text.trim() : "";
+    const answer = Array.isArray(result.output)
+    ? result.output.flatMap(item => item.type === "message" && Array.isArray(item.content)
+      ? item.content.filter(part => part.type === "output_text" && typeof part.text === "string").map(part => part.text)
+      : []).join("\n").trim()
+    : "";
     if (!answer) return send(res, 502, { error: "AIから返答を受け取れませんでした。もう一度試してください。" });
     return send(res, 200, { reply: answer.slice(0, 1600), model });
   } catch (err) {
