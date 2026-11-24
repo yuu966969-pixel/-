@@ -152,6 +152,23 @@ const outpost= new THREE.Group();outpost.position.copy(basePos);scene.add(outpos
 for(const [x,z,w,d] of [[0,-5,12,.5],[-6,0,.5,10],[6,0,.5,10],[0,5,12,.5]]){const wall=new THREE.Mesh(new THREE.BoxGeometry(w,3,d),dark);wall.position.set(x,1.5,z);outpost.add(wall)}
 for(const [x,z] of [[-3,-2],[3,-2],[-3,2],[3,2]]){const consoleBox=new THREE.Mesh(new THREE.BoxGeometry(1,.9,.8),rust);consoleBox.position.set(x,.5,z);outpost.add(consoleBox)}
 const outpostRoof=new THREE.Mesh(new THREE.BoxGeometry(12,.35,10),stone);outpostRoof.position.y=3.2;outpostRoof.rotation.z=.025;outpost.add(outpostRoof);
+
+/* Physical room shells appear as the research wing is restored. */
+const facilityRoomModels={};
+const facilityRoomLayout=[
+ ['contain',-13,8],['observe',-8,8],['memory',-3,8],
+ ['ability',2,8],['resist',7,8],['archive',12,8]
+];
+for(const [id,ox,oz] of facilityRoomLayout){
+ const room=new THREE.Group();room.position.set(basePos.x+ox,0,basePos.z+oz);scene.add(room);
+ const floorMesh=new THREE.Mesh(new THREE.BoxGeometry(4.6,.28,4.6),dark);floorMesh.position.y=.05;room.add(floorMesh);
+ for(const [x,z,w,d] of [[0,-2.2,4.6,.2],[-2.2,0,.2,4.6],[2.2,0,.2,4.6],[0,2.2,4.6,.2]]){const wall=new THREE.Mesh(new THREE.BoxGeometry(w,2.8,d),stone);wall.position.set(x,1.45,z);room.add(wall)}
+ const roof=new THREE.Mesh(new THREE.BoxGeometry(4.7,.2,4.7),dark);roof.position.y=2.9;room.add(roof);
+ const consoleMesh=new THREE.Mesh(new THREE.BoxGeometry(1.2,.9,.7),rust);consoleMesh.position.set(0,.65,0);room.add(consoleMesh);
+ const indicator=new THREE.Mesh(new THREE.BoxGeometry(.5,.35,.06),glow);indicator.position.set(0,1.5,2.08);room.add(indicator);
+ room.visible=false;facilityRoomModels[id]=room;
+}
+
 const memoriesById=id=>memories.find(m=>m.id===id);
 function addXP(n){playerXP+=n;while(playerXP>=playerLevel*40){playerXP-=playerLevel*40;playerLevel++;health=100;energy=Math.min(100,energy+8);say('N.O.V.A.：成長を確認。主人公レベル '+playerLevel+'。耐久機構を再調整しました。')}save(false)}
 function systemMenu(title,html,after){menu=true;researchMenu=false;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">RE:MEMORY / SYSTEM</div><h2>'+title+'</h2>'+html+'<button class="menuitem" id="systemBack">Esc / Tab — 戻る</button>';document.getElementById('systemBack').onclick=()=>openMenu();if(after)after();const first=document.querySelector('#dialog button:not(#systemBack),#dialog input');if(first)first.focus()}
@@ -348,6 +365,7 @@ function animate(){
  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(started&&!menu){
   gameTime+=dt;
+  for(const [id,room] of Object.entries(facilityRoomModels))room.visible=!!facilityRooms[id];
   for(const survivor of survivorMarkers)survivor.group.visible=!storyFlags[survivor.id];for(const crystal of memoryCrystals)crystal.group.visible=!collectedCrystals.includes(crystal.id);
   const talking=performance.now()<npcTalkUntil;npcMouth.scale.y=talking?(0.25+Math.abs(Math.sin(performance.now()*.012))*.9):.12;npcTeeth.visible=talking&&npcMouth.scale.y>.55;
   if(borrowedMemory&&memoryLoanDue>0&&gameTime>memoryLoanDue&&!memoryLoanTrustPenaltyApplied){memoryLoanTrustPenaltyApplied=true;const lender=companions[0];if(lender)lender.trust=Math.max(0,(lender.trust||0)-8);say('N.O.V.A.：記憶の貸借期限を超過。貸し手との信頼が低下しました。返却は引き続き可能です。');save(false)}
