@@ -519,7 +519,7 @@ const backupKey='rememory-apurf789-backup-v2';
 const slotKey='rememory-apurf789-slot-';
 let lastSaveLabel='';
 function buildSaveData(){return {version:10,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y},kegareMemories,merchantTrades,conversationHistory,facilityRooms,gameTime,memoryLoanDue,memoryLoanTrustPenaltyApplied,lastMemoryDrainAt,collectedCrystals,enemyRewarded,finalBossUnlocked,bossHP,bossAlert,bossDefeated,bossCaptured,endingChoice,audioEnabled,driving,bossPosition:{x:finalBoss.position.x,y:finalBoss.position.y,z:finalBoss.position.z},extraKegare:extraKegare.map(x=>({id:x.id,hp:x.hp,captured:x.captured,alert:x.alert,rewarded:x.rewarded}))}}
-function saveSlot(slot){try{localStorage.setItem(slotKey+slot,JSON.stringify(buildSaveData()));lastSaveLabel='スロット'+slot+' 保存完了：'+new Date().toLocaleString('ja-JP');say('N.O.V.A.：'+lastSaveLabel);save(false);openMenu()}catch(e){say('N.O.V.A.：スロット保存に失敗しました。保存容量を確認してください。')}}
+function saveSlot(slot){try{localStorage.setItem(slotKey+slot,JSON.stringify(buildSaveData()));lastSaveLabel='スロット'+slot+' 保存完了：'+new Date().toLocaleString('ja-JP');say('N.O.V.A.：'+lastSaveLabel);openMenu()}catch(e){say('N.O.V.A.：スロット保存に失敗しました。保存容量を確認してください。')}}
 function loadSlot(slot){const key=slotKey+slot;if(!localStorage.getItem(key)){say('N.O.V.A.：スロット'+slot+'に保存データがありません。');return}if(load(key)){say('N.O.V.A.：スロット'+slot+'から読み込みました。');closeMenu()}else say('N.O.V.A.：スロット'+slot+'のデータを読み込めませんでした。')}
 function save(manual=false){
  try{
@@ -535,7 +535,7 @@ function save(manual=false){
  }catch(err){lastSaveLabel='セーブ失敗：ブラウザの保存容量を確認してください';say('N.O.V.A.：'+lastSaveLabel);return false}
 }
 function load(requestedKey=null){
- const candidates=requestedKey?[[requestedKey.slice(slotKey.length)?'スロット'+requestedKey.slice(slotKey.length):'指定保存',requestedKey]]:[['自動保存',saveKey],['手動保存',manualSaveKey],['バックアップ1',backupKey+'-1'],['バックアップ2',backupKey+'-2']];
+ const candidates=requestedKey?[[requestedKey.slice(slotKey.length)?'スロット'+requestedKey.slice(slotKey.length):'指定保存',requestedKey]]:[['自動保存',saveKey],['手動保存',manualSaveKey],['バックアップ1',backupKey+'-1'],['バックアップ2',backupKey+'-2'],['スロット1',slotKey+'1'],['スロット2',slotKey+'2'],['スロット3',slotKey+'3']];
  for(const [label,key] of candidates){
   try{
    const raw=localStorage.getItem(key);if(!raw)continue;
