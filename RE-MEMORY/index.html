@@ -420,7 +420,9 @@ function animate(){
  if(started&&!menu){
   gameTime+=dt;
   for(const [id,room] of Object.entries(facilityRoomModels))room.visible=!!facilityRooms[id];
-  for(const survivor of survivorMarkers)survivor.group.visible=!storyFlags[survivor.id];for(const crystal of memoryCrystals)crystal.group.visible=!collectedCrystals.includes(crystal.id);
+  if(storyFlags.survivor&&baseUnlocked){npcPos.set(basePos.x+2,0,basePos.z+5);npcMarker.position.copy(npcPos)}
+  for(const survivor of survivorMarkers){const found=!!storyFlags[survivor.id];survivor.group.visible=!found||(baseUnlocked&&found);if(found&&baseUnlocked)survivor.group.position.set(basePos.x+(survivor.id==='ren'?-3:3),0,basePos.z+5.5);else survivor.group.position.copy(survivor.position)}
+  for(const crystal of memoryCrystals)crystal.group.visible=!collectedCrystals.includes(crystal.id);
   if(borrowedMemory&&memoryLoanDue>0&&gameTime>memoryLoanDue&&!memoryLoanTrustPenaltyApplied){memoryLoanTrustPenaltyApplied=true;const lender=companions[0];if(lender)lender.trust=Math.max(0,(lender.trust||0)-8);say('N.O.V.A.：記憶の貸借期限を超過。貸し手との信頼が低下しました。返却は引き続き可能です。');save(false)}
   const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
   const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
