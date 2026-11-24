@@ -102,12 +102,13 @@ function hidePrompt(){prompt.classList.add('hidden')}
 let scrap=24,credits=180,playerLevel=1,playerXP=0,baseUnlocked=false,baseLevel=0,researchFacility=0,kegareMemories=0,merchantTrades=0;
 let companions=[],party=[],memories=[{id:'childhood',name:'幼い日の記憶',value:18,available:true},{id:'home',name:'帰る場所の記憶',value:24,available:true}],borrowedMemory=null;
 let novaGrowth=0,novaTone='標準',gachaCount=0,equipped='旧式パルス装置',equipment=['旧式パルス装置'],weaponPower=1;
+let facilityRooms={},gameTime=0,memoryLoanDue=0,memoryLoanTrustPenaltyApplied=false;
 let storyFlags={awakening:true,terminal:false,firstKegare:false,survivor:false,base:false,chronos:false};
 const npcPos=new THREE.Vector3(18,0,-48),basePos=new THREE.Vector3(-22,0,-43);
 const npcMarker= new THREE.Group();npcMarker.position.copy(npcPos);scene.add(npcMarker);
 const npcBody=new THREE.Mesh(new THREE.CapsuleGeometry(.38,.8,4,7),mat(0x52666a));npcBody.position.y=1;npcMarker.add(npcBody);
 const npcHead=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),mat(0xb9a58f));npcHead.position.y=1.7;npcMarker.add(npcHead);
-const npcLamp=new THREE.PointLight(0x8bdac8,1.6,8);npcLamp.position.y=2.2;npcMarker.add(npcLamp);
+const npcMouth=new THREE.Mesh(new THREE.SphereGeometry(.075,10,8),mat(0x241719));npcMouth.scale.set(1,.35,.35);npcMouth.position.set(0,1.65,.235);npcMarker.add(npcMouth);const npcTeeth=new THREE.Mesh(new THREE.BoxGeometry(.085,.025,.018),mat(0xe7e2d5));npcTeeth.position.set(0,1.67,.27);npcTeeth.visible=false;npcMarker.add(npcTeeth);let npcTalkUntil=0;const npcLamp=new THREE.PointLight(0x8bdac8,1.6,8);npcLamp.position.y=2.2;npcMarker.add(npcLamp);
 const baseMarker=new THREE.Group();baseMarker.position.copy(basePos);scene.add(baseMarker);
 /* Strange itinerant traders who refine Kegare memories into temporal energy. */
 const merchants=[{id:'ash',name:'灰冠の商人',position:new THREE.Vector3(-38,0,-24),rate:18,description:'灰色の布を幾重にもまとい、声の代わりに古い記録音を流す。'},{id:'bell',name:'鈴鳴りの商人',position:new THREE.Vector3(35,0,-16),rate:22,description:'壊れた鈴を鳴らし、穢れの記憶に残る時間の響きを聞き分ける。'},{id:'mask',name:'仮面の商人',position:new THREE.Vector3(4,0,-68),rate:26,description:'顔のない仮面をつけ、記憶を小さな黒い結晶へ封じている。'}];
@@ -170,48 +171,94 @@ function openConversation(p){
  const id=p.id,history=conversationHistory[id]||(conversationHistory[id]=[]);
  const greeting=p.kind==='nova'?'接続しました。自由に質問してください。確認できない情報は不明と回答します。':p.kind==='merchant'?'……話があるなら聞こう。取引以外の質問でも構わない。':p.name+'：話したいことがあるの？何でも聞いて。';
  const lines=(history.length?history:[{speaker:p.name,text:greeting}]).slice(-12).map(m=>'<p><strong>'+escapeChat(m.speaker)+'：</strong>'+escapeChat(m.text)+'</p>').join('');
- systemMenu(p.name+'との会話','<p class="small">'+escapeChat(p.role||'')+' / '+escapeChat(p.personality||'')+'</p><div style="max-height:38vh;overflow:auto;border:1px solid #49616a66;padding:8px;background:#080e13">'+lines+'</div><form id="freeChatForm"><input id="freeChatInput" style="width:100%;padding:11px;margin-top:10px;background:#101b22;color:#eaf4f1;border:1px solid #66838a" maxlength="240" autocomplete="off" placeholder="自由に話しかける"><button class="menuitem" type="submit">Enter — 送信</button></form><p id="chatStatus" class="small">オンラインAI接続待機中。メッセージを送るとサーバー上のAIが返答します。</p><p class="small">入力内容と直近の会話は、NPCの返答生成のためCloudflareのAIサービスへ送信されます。氏名・住所・学校名・連絡先などの個人情報は入力しないでください。</p><p class="small">自由入力・最大240文字。会話履歴はセーブデータに保存されます。</p>',()=>{
-  const form=document.getElementById('freeChatForm'),input=document.getElementById('freeChatInput'),status=document.getElementById('chatStatus'),button=form.querySelector('button');
-  form.onsubmit=async e=>{
-   e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q||button.disabled)return;
-   button.disabled=true;input.disabled=true;status.textContent='AIが返答を考えています……';
+ systemMenu(p.name+'との会話','<p class="small">'+escapeChat(p.role||'')+' / '+escapeChat(p.personality||'')+'</p><div style="max-height:38vh;overflow:auto;border:1px solid #49616a66;padding:8px;background:#080e13">'+lines+'</div><form id="freeChatForm"><input id="freeChatInput" style="width:100%;padding:11px;margin-top:10px;background:#101b22;color:#eaf4f1;border:1px solid #66838a" maxlength="240" autocomplete="off" placeholder="自由に話しかける"><button class="menuitem" type="submit">Enter — 送信</button></form><p id="chatStatus" class="small">ローカル会話システム稼働中。入力内容はこのブラウザ内で処理され、外部サーバーへ送信されません。</p><p class="small">自由入力・最大240文字。会話履歴はセーブデータに保存されます。</p>',()=>{
+  const form=document.getElementById('freeChatForm'),input=document.getElementById('freeChatInput'),status=document.getElementById('chatStatus');
+  form.onsubmit=e=>{
+   e.preventDefault();e.stopPropagation();const q=input.value.trim();if(!q)return;
    const log=conversationHistory[id]||(conversationHistory[id]=[]);
    const ally=p.kind==='companion'?companions.find(x=>x.id===p.id):null;
-   const payload={
-    characterId:p.id,characterName:p.name,kind:p.kind,role:p.role||'',personality:p.personality||'',message:q,
-    history:log.slice(-10).map(m=>({role:m.speaker==='あなた'?'user':'assistant',content:m.text})),
-    context:{trust:ally?.trust??null,level:ally?.level??null,novaTone:novaTone,playerLevel:playerLevel,merchantTrades:merchantTrades}
-   };
-   try{
-    const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    const data=await response.json().catch(()=>({}));
-    if(!response.ok)throw new Error(data.error||'AIサーバーからエラーが返されました。');
-    if(typeof data.reply!=='string'||!data.reply.trim())throw new Error('AIから空の返答が届きました。');
-    log.push({speaker:'あなた',text:q},{speaker:p.name,text:data.reply.trim()});
-    if(p.kind==='companion'&&ally){ally.talkCount=(ally.talkCount||0)+1;if(ally.talkCount%4===0)ally.trust=Math.min(100,(ally.trust||0)+1)}
-    if(p.kind==='nova')novaGrowth++;
-    save(false);openConversation(p);
-   }catch(err){
-    status.textContent='AI接続エラー：'+(err.message||'サーバーに接続できません。')+' / オンラインAIサーバーの設定を確認してから、もう一度送信してください。';
-    button.disabled=false;input.disabled=false;input.focus();
-   }
+   const answer=characterReply(p,q);
+   log.push({speaker:'あなた',text:q},{speaker:p.name,text:answer});
+   if(p.kind==='companion'&&ally){npcTalkUntil=performance.now()+2600;ally.talkCount=(ally.talkCount||0)+1;if(ally.talkCount%3===0)ally.trust=Math.min(100,(ally.trust||0)+1)}
+   if(p.kind==='nova')novaGrowth++;
+   save(false);openConversation(p);
   };
   input.focus();
  });
 }
-function openMemory(){const rows=memories.map((m,i)=>'<p>'+(i+1)+'. '+m.name+' — エネルギー '+m.value+' / '+(m.available?'保持中':'貸出中・喪失')+'</p>').join('')||'<p>利用可能な記憶はありません。</p>';const loan=companions.length?'<p>ミナから「記憶を貸してほしい」と依頼されています。選択によって信頼関係が変化します。</p><button class="menuitem" id="lendMemory">依頼を承認して記憶を貸す</button><button class="menuitem" id="refuseMemory">依頼を断る</button><button class="menuitem" id="negotiateMemory">条件を交渉する</button><button class="menuitem" id="borrowMemory">仲間の記憶を借りる</button><button class="menuitem" id="returnMemory">貸し借り中の記憶を返却する</button>':'';systemMenu('記憶アーカイブ','<p>記憶を時間エネルギーへ変換できます。使用した記憶は失われ、侵食が増加します。穢れの記憶抽出は通常の2倍の侵食です。</p>'+rows+'<button class="menuitem" id="convertMemory">最も古い保持記憶を変換</button>'+loan+'<p>記憶侵食：'+corruption+'%　貸借状態：'+(borrowedMemory?borrowedMemory.name+'（一時貸借中）':'なし')+'</p>',()=>{document.getElementById('convertMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：変換できる記憶がありません。');return}m.available=false;energy=Math.min(100,energy+m.value);corruption=Math.min(100,corruption+Math.ceil(m.value/3));updateHUD();say('N.O.V.A.：'+m.name+'を時間エネルギーへ変換しました。この記憶は失われました。');save();openMemory()};if(companions.length){document.getElementById('lendMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：貸し出せる記憶がありません。');return}m.available=false;borrowedMemory={direction:'to-companion',name:m.name,id:m.id,value:m.value};say('依頼を承認。'+m.name+'を一時的に貸し出しました。返却されるまで主人公は利用できません。');save();openMemory()};document.getElementById('refuseMemory').onclick=()=>{say('依頼を断りました。ミナは残念そうですが、関係は維持されています。');save();openMemory()};document.getElementById('negotiateMemory').onclick=()=>{credits+=15;say('返却期限と記憶の扱いを交渉。合意したためクレジット15を受け取り、貸出は保留されました。');save();openMemory()};document.getElementById('borrowMemory').onclick=()=>{if(borrowedMemory){say('N.O.V.A.：すでに貸借中の記憶があります。');return}borrowedMemory={direction:'from-companion',name:companions[0].name+'の大切な記憶',id:'companion-memory',value:12};memories.push({id:'loaned-'+Date.now(),name:borrowedMemory.name,value:12,available:true,loaned:true});say(companions[0].name+'から記憶を借りました。返却するまでの一時利用です。');save();openMemory()};document.getElementById('returnMemory').onclick=()=>{if(!borrowedMemory){say('N.O.V.A.：返却する記憶はありません。');return}if(borrowedMemory.direction==='to-companion'){const m=memoriesById(borrowedMemory.id);if(m)m.available=true}else{memories=memories.filter(m=>!m.loaned)}say(borrowedMemory.name+'を返却しました。');borrowedMemory=null;save();openMemory()}}})}
+function openMemory(){const rows=memories.map((m,i)=>'<p>'+(i+1)+'. '+m.name+' — エネルギー '+m.value+' / '+(m.available?'保持中':'貸出中・喪失')+'</p>').join('')||'<p>利用可能な記憶はありません。</p>';const loan=companions.length?'<p>ミナから「記憶を貸してほしい」と依頼されています。選択によって信頼関係が変化します。</p><button class="menuitem" id="lendMemory">依頼を承認して記憶を貸す</button><button class="menuitem" id="refuseMemory">依頼を断る</button><button class="menuitem" id="negotiateMemory">条件を交渉する</button><button class="menuitem" id="borrowMemory">仲間の記憶を借りる</button><button class="menuitem" id="returnMemory">貸し借り中の記憶を返却する</button>':'';systemMenu('記憶アーカイブ','<p>記憶を時間エネルギーへ変換できます。使用した記憶は失われ、侵食が増加します。穢れの記憶抽出は通常の2倍の侵食です。</p>'+rows+'<button class="menuitem" id="convertMemory">最も古い保持記憶を変換</button>'+loan+'<p>記憶侵食：'+corruption+'%　貸借状態：'+(borrowedMemory?borrowedMemory.name+'（一時貸借中・残り '+Math.max(0,Math.ceil((memoryLoanDue-gameTime)/60))+'分）':'なし')+'</p>',()=>{document.getElementById('convertMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：変換できる記憶がありません。');return}m.available=false;energy=Math.min(100,energy+m.value);corruption=Math.min(100,corruption+Math.ceil(m.value/3));updateHUD();say('N.O.V.A.：'+m.name+'を時間エネルギーへ変換しました。この記憶は失われました。');save();openMemory()};if(companions.length){document.getElementById('lendMemory').onclick=()=>{const m=memories.find(x=>x.available);if(!m){say('N.O.V.A.：貸し出せる記憶がありません。');return}m.available=false;borrowedMemory={direction:'to-companion',name:m.name,id:m.id,value:m.value};memoryLoanDue=gameTime+600;memoryLoanTrustPenaltyApplied=false;say('依頼を承認。'+m.name+'を一時的に貸し出しました。返却されるまで主人公は利用できません。');save();openMemory()};document.getElementById('refuseMemory').onclick=()=>{say('依頼を断りました。ミナは残念そうですが、関係は維持されています。');save();openMemory()};document.getElementById('negotiateMemory').onclick=()=>{credits+=15;say('返却期限と記憶の扱いを交渉。合意したためクレジット15を受け取り、貸出は保留されました。');save();openMemory()};document.getElementById('borrowMemory').onclick=()=>{if(borrowedMemory){say('N.O.V.A.：すでに貸借中の記憶があります。');return}borrowedMemory={direction:'from-companion',name:companions[0].name+'の大切な記憶',id:'companion-memory',value:12};memoryLoanDue=gameTime+600;memoryLoanTrustPenaltyApplied=false;memories.push({id:'loaned-'+Date.now(),name:borrowedMemory.name,value:12,available:true,loaned:true});say(companions[0].name+'から記憶を借りました。返却するまでの一時利用です。');save();openMemory()};document.getElementById('returnMemory').onclick=()=>{if(!borrowedMemory){say('N.O.V.A.：返却する記憶はありません。');return}if(borrowedMemory.direction==='to-companion'){const m=memoriesById(borrowedMemory.id);if(m)m.available=true}else{memories=memories.filter(m=>!m.loaned)}say(borrowedMemory.name+'を返却しました。');borrowedMemory=null;memoryLoanDue=0;memoryLoanTrustPenaltyApplied=false;save();openMemory()}}})}
 function openMerchant(m){systemMenu(m.name,'<p>'+m.description+'</p><p>クロノス計画の元技術者。穢れの記憶を時間エネルギーへ変換する。</p><button class="menuitem" id="merchantTalk">自由に会話する</button><p>交換：穢れの記憶片 1個 → 時間エネルギー '+m.rate+'。</p><p>所持：記憶片 '+kegareMemories+'個 / エネルギー '+energy+'。</p><p class="small">穢れの記憶の変換は通常の2倍の侵食を伴います。</p><button class="menuitem" id="tradeKegare">記憶片を1個変換する</button><p>取引回数：'+merchantTrades+'</p>',()=>{document.getElementById('merchantTalk').onclick=()=>openConversation({id:m.id,name:m.name,kind:'merchant',role:'クロノス計画の元技術者',personality:m.id==='ash'?'冷静な記憶変換研究主任':m.id==='bell'?'音で時間異常を観測する技術者':'口数の少ない時間兵器開発技術者'});document.getElementById('tradeKegare').onclick=()=>{if(kegareMemories<1){say('商人：記憶片を持たぬ者とは取引できない。穢れから採取してくるがいい。');return}if(energy>=100){say('商人：時間エネルギーが満ちている。先に使うことだ。');return}kegareMemories--;energy=Math.min(100,energy+m.rate);corruption=Math.min(100,corruption+12);merchantTrades++;updateHUD();say('商人：取引成立。穢れの記憶片を時間エネルギーへ変換した。記憶侵食が増加している……。');save();openMerchant(m)}})}
-function openResearchFacility(){systemMenu('穢れ研究施設','<p>捕獲数：'+(captured?1:0)+'　研究段階：'+researchFacility+'</p><p>収容室・観察室・記憶解析室・能力実験室・耐性研究室・資料庫を順に整備します。</p><p>設備強化：資材 '+(12+researchFacility*8)+' が必要。</p><button class="menuitem" id="upgradeResearch">研究施設を強化</button><p class="small">強化で解析効率と穢れデータの用途が拡張されます。</p>',()=>{document.getElementById('upgradeResearch').onclick=()=>{const cost=12+researchFacility*8;if(!baseUnlocked||scrap<cost){say('N.O.V.A.：基地確保と資材 '+cost+' が必要です。');return}scrap-=cost;researchFacility++;researchLevel++;save();openResearchFacility()}})}
+const researchRooms=[
+ {id:'contain',name:'収容室',desc:'捕獲した穢れを安全な隔離領域で保管',cost:12},
+ {id:'observe',name:'観察室',desc:'行動周期・反応・弱点の記録',cost:18},
+ {id:'memory',name:'記憶解析室',desc:'穢れの記憶構造を解析',cost:24},
+ {id:'ability',name:'能力実験室',desc:'時間反応と特殊能力の検証',cost:30},
+ {id:'resist',name:'耐性研究室',desc:'記憶侵食・時間異常への耐性研究',cost:36},
+ {id:'archive',name:'資料庫',desc:'個体記録・研究ログ・弱点情報の保管',cost:42}
+];
+function openResearchFacility(){
+ const built=researchRooms.filter(r=>facilityRooms&&facilityRooms[r.id]).map(r=>' <p>✓ '+r.name+'：'+r.desc+'</p>').join('');
+ const next=researchRooms.find(r=>!facilityRooms||!facilityRooms[r.id]);
+ const action=next?'<p>次の設備：'+next.name+' / 資材 '+next.cost+'</p><button class="menuitem" id="buildResearchRoom">次の研究室を修復</button>':'<p>全研究室の修復が完了しました。研究データを統合できます。</p><button class="menuitem" id="integrateResearch">研究データを統合（穢れデータ2・エネルギー8）</button>';
+ systemMenu('穢れ研究施設','<p>捕獲数：'+(captured?1:0)+'　研究段階：'+researchFacility+'　資材：'+scrap+'</p><p>研究設備は廃墟の区画を順に再稼働させます。</p>'+built+action+'<p class="small">全モンスターは穢れに分類。研究は非侵襲的な観察・記録・能力検証を中心に行います。</p>',()=>{
+  const build=document.getElementById('buildResearchRoom');
+  if(build)build.onclick=()=>{if(!baseUnlocked){say('N.O.V.A.：先に旧観測拠点を確保してください。');return}if(!captured){say('N.O.V.A.：研究室の修復には穢れの捕獲が必要です。');return}if(scrap<next.cost){say('N.O.V.A.：資材が不足しています。');return}scrap-=next.cost;facilityRooms=facilityRooms||{};facilityRooms[next.id]=true;researchFacility++;researchLevel++;say(next.name+'を修復しました。'+next.desc+'。');updateHUD();save();openResearchFacility()};
+  const integrate=document.getElementById('integrateResearch');
+  if(integrate)integrate.onclick=()=>{if(kegareData<2||energy<8){say('N.O.V.A.：研究資源が不足しています。');return}kegareData-=2;energy-=8;analysisUnlocked=true;timeLevel++;corruption=Math.max(0,corruption-6);say('研究統合完了。時間制御レベルと記憶耐性が向上しました。');updateHUD();save();openResearchFacility()};
+ });
+}
 function openCompanions(){const roster=companions.length?companions.map((p,i)=>'<p>'+(i+1)+'. '+p.name+' / Lv.'+p.level+' / '+p.role+(party.includes(p.id)?' <strong>編成中</strong>':'')+' / 信頼 '+(p.trust||0)+'</p><button class="menuitem" data-talk-ally="'+p.id+'">'+p.name+'と自由に会話する</button>').join(''):'<p>仲間はまだいません。開始地点に仲間はいません。外の世界で出会う必要があります。</p>';systemMenu('仲間・パーティー','<p>主人公 Lv.'+playerLevel+'（固定枠・解除不可）　経験値 '+playerXP+'/'+(playerLevel*40)+'</p>'+roster+'<p>編成人数：'+(party.length+1)+' / 4（主人公を含む）</p><button class="menuitem" id="toggleParty">仲間の編成を切り替える</button><button class="menuitem" id="trainParty">編成中の仲間を育成（資材8）</button>',()=>{document.querySelectorAll('[data-talk-ally]').forEach(b=>b.onclick=()=>{const p=companions.find(x=>x.id===b.dataset.talkAlly);if(p)openConversation({id:p.id,name:p.name,kind:'companion',role:p.role,personality:'仲間。経験や信頼関係に応じて少しずつ本音を話す。'})});document.getElementById('toggleParty').onclick=()=>{if(!companions.length){say('N.O.V.A.：仲間がいません。生存者との遭遇が必要です。');return}const p=companions[0];party=party.includes(p.id)?party.filter(x=>x!==p.id):party.length<3?[...party,p.id]:party;say(p.name+(party.includes(p.id)?'を編成しました。':'を待機に戻しました。'));save();openCompanions()};document.getElementById('trainParty').onclick=()=>{if(!companions.length||scrap<8){say('N.O.V.A.：育成対象または資材が不足しています。');return}scrap-=8;companions.forEach(p=>{if(party.includes(p.id))p.level++});save();openCompanions()}})}
-function openBase(){systemMenu('基地運営','<p>基地レベル：'+baseLevel+'　資材：'+scrap+'</p><p>稼働施設：司令室 '+(baseLevel>0?'稼働':'未整備')+' / 穢れ研究 '+(researchFacility?'Lv.'+researchFacility:'未整備')+' / 医療 '+(baseLevel>1?'稼働':'未整備')+' / 記憶保管 '+(baseLevel>2?'稼働':'未整備')+'</p><button class="menuitem" id="upgradeBase">基地を拡張（資材 '+(15+baseLevel*10)+'）</button><button class="menuitem" id="baseResearch">穢れ研究施設を管理</button>',()=>{document.getElementById('upgradeBase').onclick=()=>{const cost=15+baseLevel*10;if(scrap<cost){say('N.O.V.A.：資材が不足しています。');return}scrap-=cost;baseLevel++;save();openBase()};document.getElementById('baseResearch').onclick=openResearchFacility})}
-function openGacha(){systemMenu('召集・装備','<p>所持クレジット：'+credits+'　召集回数：'+gachaCount+'</p><p>ゲーム内通貨のみを使用します。現実のお金は使用しません。</p><button class="menuitem" id="drawCharacter">仲間候補をスカウト（60クレジット）</button><button class="menuitem" id="drawGear">装備を抽選（40クレジット）</button><p>装備：'+equipment.join('、')+'　装備中：'+equipped+'　攻撃補正 Lv.'+weaponPower+'</p><button class="menuitem" id="upgradeGear">装備強化（資材10）</button>',()=>{document.getElementById('drawCharacter').onclick=()=>{if(!storyFlags.survivor){say('N.O.V.A.：まず外の世界で生存者と遭遇してください。未発見の人物を召集することはできません。');return}if(credits<60){say('N.O.V.A.：クレジット不足です。');return}credits-=60;gachaCount++;const names=['ミナ','レン','ユイ','カイ'];const name=names[(gachaCount-1)%names.length];if(!companions.some(p=>p.name===name)){companions.push({id:'ally-'+gachaCount,name,level:1,role:['観測','防衛','解析','支援'][companions.length%4]});say(name+'と連絡がつきました。スカウト候補として登録されました。')}else{scrap+=8;say('重複候補の記録を資材8に変換しました。')}save();openGacha()};document.getElementById('drawGear').onclick=()=>{if(credits<40){say('N.O.V.A.：クレジット不足です。');return}credits-=40;gachaCount++;const gears=['共鳴ブレード','時間安定装置','記憶耐性コート','高出力パルス装置'];const item=gears[(gachaCount-1)%gears.length];if(!equipment.includes(item))equipment.push(item);equipped=item;say('装備を獲得・装備しました：'+item);save();openGacha()};document.getElementById('upgradeGear').onclick=()=>{if(scrap<10){say('N.O.V.A.：資材不足です。');return}scrap-=10;weaponPower++;save();openGacha()}})}
+function openBase(){
+ const facilities=[['command','司令室',1],['workshop','武器工房',2],['medical','医療室',3],['archive','記憶保管庫',4],['ai','N.O.V.A.解析室',5]];
+ const status=facilities.map(([id,name,level])=>'<p>'+(baseLevel>=level?'✓ ':'□ ')+name+'：基地Lv.'+level+'で稼働</p>').join('');
+ const cost=15+baseLevel*10;
+ systemMenu('基地運営','<p>基地レベル：'+baseLevel+'　資材：'+scrap+'</p><p>廃墟の旧観測拠点。修復状況：</p>'+status+'<p>次の拡張費用：資材 '+cost+'</p><button class="menuitem" id="upgradeBase">基地を拡張</button><button class="menuitem" id="baseResearch">穢れ研究施設を管理</button><button class="menuitem" id="baseParty">司令室：パーティー編成</button>',()=>{
+  document.getElementById('upgradeBase').onclick=()=>{if(scrap<cost){say('N.O.V.A.：資材が不足しています。');return}scrap-=cost;baseLevel++;say('基地レベル '+baseLevel+'。施設区画の電力を復旧しました。');updateHUD();save();openBase()};
+  document.getElementById('baseResearch').onclick=openResearchFacility;
+  document.getElementById('baseParty').onclick=openCompanions;
+ });
+}
+function openGacha(){
+ const rates=rarityRates.map(r=>r.id+' '+r.rate+'%').join(' / ');
+ const owned=companions.length?companions.map(p=>p.name+'（'+(p.rarity||'N')+'）').join('、'):'発見済みの仲間なし';
+ const gearList=equipment.map(x=>typeof x==='string'?x:x.name).join('、');
+ systemMenu('召集・装備','<p>所持クレジット：'+credits+'　抽選回数：'+gachaCount+'</p><p>レアリティ確率：'+rates+'</p><p class="small">確率は各抽選で独立。ゲーム内通貨のみで、現実のお金は使用しません。</p><p>発見済みの仲間：'+escapeChat(owned)+'</p><button class="menuitem" id="drawCharacter">発見済みの仲間と共鳴（60クレジット）</button><button class="menuitem" id="drawGear">装備を抽選（40クレジット）</button><p>装備：'+escapeChat(gearList)+'　装備中：'+escapeChat(equipped)+'　強化Lv.'+weaponPower+'</p><button class="menuitem" id="upgradeGear">装備強化（資材10）</button><p class="small">重複した仲間は信頼・育成素材に変換。重複装備は強化素材になります。</p>',()=>{
+  document.getElementById('drawCharacter').onclick=()=>{
+   if(!companions.length){say('N.O.V.A.：召集対象がありません。まず生存者と実際に出会ってください。');return}
+   if(credits<60){say('N.O.V.A.：クレジット不足です。');return}
+   credits-=60;gachaCount++;const rarity=rollRarity();
+   const target=companions[Math.floor(Math.random()*companions.length)];
+   target.rarity=target.rarity||rarity;
+   if(rarity==='UR'||rarity==='SSR'||rarity==='SR')target.trust=Math.min(100,(target.trust||0)+(rarity==='UR'?12:rarity==='SSR'?8:5));
+   else target.trust=Math.min(100,(target.trust||0)+2);
+   if(target.lastResonance){target.level=(target.level||1)+1;scrap+=rarity==='UR'?18:rarity==='SSR'?12:8;say(rarity+' 共鳴重複：'+target.name+'のレベルが上昇。資材も獲得しました。')}
+   else{target.lastResonance=true;say(rarity+' 共鳴記録：'+target.name+'との連携データを強化しました。')}
+   target.resonance=(target.resonance||0)+1;updateHUD();save();openGacha();
+  };
+  document.getElementById('drawGear').onclick=()=>{
+   if(credits<40){say('N.O.V.A.：クレジット不足です。');return}
+   credits-=40;gachaCount++;const rarity=rollRarity();
+   const pool=[
+    {name:'共鳴ブレード',type:'武器',power:2},{name:'時間安定装置',type:'補助',power:1},
+    {name:'記憶耐性コート',type:'防具',power:1},{name:'高出力パルス装置',type:'武器',power:3},
+    {name:'残響観測器',type:'解析',power:2},{name:'位相反転シールド',type:'防具',power:3}
+   ];
+   const item=pool[Math.floor(Math.random()*pool.length)],label=rarity+' '+item.name;
+   const existing=equipment.includes(label)||equipment.some(x=>(typeof x==='string'?x:x.name)===label);
+   if(existing){scrap+=rarity==='UR'?20:rarity==='SSR'?14:rarity==='SR'?10:6;say(label+'が重複。強化資材へ変換しました。')}
+   else{equipment.push(label);equipped=label;weaponPower=Math.max(weaponPower,item.power+(rarity==='UR'?4:rarity==='SSR'?3:rarity==='SR'?2:0));say(rarity+' 装備獲得：'+item.name+'。装備しました。')}
+   updateHUD();save();openGacha();
+  };
+  document.getElementById('upgradeGear').onclick=()=>{if(scrap<10){say('N.O.V.A.：資材不足です。');return}scrap-=10;weaponPower++;say('装備出力を強化しました。攻撃補正 Lv.'+weaponPower);save();openGacha()};
+ });
+}
 function openStory(){systemMenu('クロノス計画・記録','<p>第一記録：APURF789は人類発祥の惑星であり、人類文明の故郷だった。</p><p>第二記録：クロノス計画は時間をエネルギーとして利用する研究から始まり、医療・災害対策にも応用された。</p><p>第三記録：計画は兵器転用され、核戦争と時間兵器の同時使用で惑星の時間構造が崩壊。</p><p>第四記録：主人公は戦争当時12歳。保護施設で本人にとって8年を過ごし、20歳で目覚めた。外界では数億年が経過した。</p><p>復元済み記録：'+Object.values(storyFlags).filter(Boolean).length+' / 7</p><button class="menuitem" id="restoreChronos">破損ログを追加解析</button>',()=>{document.getElementById('restoreChronos').onclick=()=>{if(energy<6){say('N.O.V.A.：解析エネルギーが不足しています。');return}energy-=6;storyFlags.chronos=true;novaGrowth++;updateHUD();say('N.O.V.A.：クロノス計画の追加ログを復元。時間逆行実験が都市全域に影響した記録を確認しました。');save();openStory()}})}
 function openMenu(){menu=true;researchMenu=false;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久 '+health+'/100　エネルギー '+energy+'　侵食 '+corruption+'%　Lv.'+playerLevel+'</p><p>資材 '+scrap+'　クレジット '+credits+'　基地 '+(baseUnlocked?'確保済み':'未確保')+'　仲間 '+companions.length+'人</p><button class="menuitem" id="mStory">① クロノス計画・ストーリー記録</button><button class="menuitem" id="mNova">② N.O.V.A.と会話</button><button class="menuitem" id="mMemory">③ 記憶アーカイブ・変換</button><button class="menuitem" id="mResearch">④ 穢れ研究施設</button><button class="menuitem" id="mParty">⑤ 仲間・編成・育成</button><button class="menuitem" id="mBase">⑥ 基地運営</button><button class="menuitem" id="mGacha">⑦ 召集・装備</button><section><h3>設定 / データ管理</h3><p id="saveStatus" class="small">'+(lastSaveLabel||'セーブデータ未作成')+'</p><button id="saveButton" class="menuitem">手動セーブ</button></section><button id="resume" class="menuitem">Enter — ゲームに戻る</button><p class="small">↑ ↓：選択　Enter：決定　Tab / Esc：戻る</p>';const bind=(id,fn)=>document.getElementById(id).onclick=fn;bind('mStory',openStory);bind('mNova',openNova);bind('mMemory',openMemory);bind('mResearch',openResearchFacility);bind('mParty',openCompanions);bind('mBase',openBase);bind('mGacha',openGacha);bind('resume',closeMenu);bind('saveButton',()=>save(true));document.getElementById('mStory').focus()}
 
 function interact(){
  if(!started||menu)return;
  if(near==='vehicle'){driving=!driving;if(driving){player.visible=false;player.position.copy(rover.position);say('N.O.V.A.：回収用ローバーを起動。WASDで走行、矢印キーで進行方向を調整できます。');}else{player.visible=true;player.position.copy(rover.position).add(new THREE.Vector3(2,0,0));say('ローバーから降りました。');}return;}
- if(near==='npc'){if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測',trust:5,talkCount:0});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);save();}const mina=companions.find(p=>p.id==='ally-first');if(mina)openConversation({id:mina.id,name:mina.name,kind:'companion',role:mina.role,personality:'慎重だが好奇心が強い。主人公と出会ってから信頼を築いている。'});return;}
+ if(near==='npc'){npcTalkUntil=performance.now()+9000;if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測',trust:5,talkCount:0});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);save();}const mina=companions.find(p=>p.id==='ally-first');if(mina)openConversation({id:mina.id,name:mina.name,kind:'companion',role:mina.role,personality:'慎重だが好奇心が強い。主人公と出会ってから信頼を築いている。'});return;}
  if(near&&near.startsWith('merchant:')){const m=merchants.find(x=>x.id===near.slice(9));if(m)openMerchant(m);return;}
  if(near==='base'){if(!baseUnlocked){baseUnlocked=true;baseLevel=1;storyFlags.base=true;objective.textContent='基地の設備を整え、穢れの記録を解析する';scrap+=10;say('N.O.V.A.：旧観測拠点を確保。司令室と基本保管庫を起動しました。穢れ研究設備は段階的に修復可能です。');save();}else openBase();return;}
  if(near==='terminal'&&terminalRead){openResearch();return;}
@@ -237,9 +284,9 @@ addEventListener('keydown',e=>{
  if(menu){const active=document.activeElement;if(active&&(['INPUT','TEXTAREA'].includes(active.tagName))){if(e.key==='Enter'){const form=active.closest('form');if(form){e.preventDefault();form.requestSubmit();}}return;}if(['ArrowUp','ArrowDown'].includes(e.key)){const items=[...document.querySelectorAll('#dialog button')];if(items.length){let i=items.indexOf(active);if(i<0)i=0;items[(i+(e.key==='ArrowDown'?1:-1)+items.length)%items.length].focus();}}else if(e.key==='Enter'&&active&&active.tagName==='BUTTON'){active.click();}return;}
  keys.add(e.key.toLowerCase());
  if(e.key.toLowerCase()==='e')interact();
- if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0)say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');save(false);}
+ if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0){say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');scrap+=6;credits+=10;addXP(12)}save(false);}
  if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;kegareMemories+=1;energy=Math.min(100,energy+10);updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';save(false);}}
- if(e.key.toLowerCase()==='q'&&started&&energy>=8){energy-=8;slowUntil=performance.now()+4200+(timeLevel-1)*1800;updateHUD();say('N.O.V.A.：局所時間加速を起動。周囲の時間流量が低下しています。')}
+ if(e.key.toLowerCase()==='q'&&started&&!menu&&energy>=8&&performance.now()>slowUntil){energy-=8;slowUntil=performance.now()+4200+(timeLevel-1)*1800;updateHUD();say('N.O.V.A.：局所時間制御を起動。穢れの移動速度と接近反応を抑制しています。')}
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
 addEventListener('blur',()=>keys.clear());
@@ -247,11 +294,14 @@ function distance(a,b){return a.position.distanceTo(b.position)}
 function animate(){
  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(started&&!menu){
+  gameTime+=dt;
+  const talking=performance.now()<npcTalkUntil;npcMouth.scale.y=talking?(0.25+Math.abs(Math.sin(performance.now()*.012))*.9):.12;npcTeeth.visible=talking&&npcMouth.scale.y>.55;
+  if(borrowedMemory&&memoryLoanDue>0&&gameTime>memoryLoanDue&&!memoryLoanTrustPenaltyApplied){memoryLoanTrustPenaltyApplied=true;const lender=companions[0];if(lender)lender.trust=Math.max(0,(lender.trust||0)-8);say('N.O.V.A.：記憶の貸借期限を超過。貸し手との信頼が低下しました。返却は引き続き可能です。');save(false)}
   const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
   const right=new THREE.Vector3(Math.cos(yaw),0,Math.sin(yaw));
   let move=new THREE.Vector3();
   if(keys.has('w'))move.add(forward);if(keys.has('s'))move.sub(forward);if(keys.has('d'))move.add(right);if(keys.has('a'))move.sub(right);
-  if(move.lengthSq()>0){move.normalize();move.multiplyScalar(driving?(keys.has('shift')?13:8):(keys.has('shift')?8.2:5.2));if(driving){rover.position.addScaledVector(move,dt);rover.rotation.y=Math.atan2(move.x,move.z);player.position.copy(rover.position);}else{player.position.addScaledVector(move,dt);player.rotation.y=Math.atan2(move.x,move.z)}}
+  if(move.lengthSq()>0){move.normalize();move.multiplyScalar(driving?(keys.has('shift')?13:8):(keys.has('shift')?8.2:5.2));if(driving){const candidate=rover.position.clone().addScaledVector(move,dt);if(Math.abs(candidate.x)<96&&Math.abs(candidate.z)<96&&candidate.distanceTo(basePos)>7&&candidate.distanceTo(new THREE.Vector3(0,0,-12))>3.2){rover.position.copy(candidate);rover.rotation.y=Math.atan2(move.x,move.z)}player.position.copy(rover.position);}else{const candidate=player.position.clone().addScaledVector(move,dt);if(Math.abs(candidate.x)<96&&Math.abs(candidate.z)<96&&candidate.distanceTo(new THREE.Vector3(0,0,-12))>1.25){player.position.copy(candidate);player.rotation.y=Math.atan2(move.x,move.z)}}}
   if(keys.has('arrowleft'))yaw+=dt*1.55;if(keys.has('arrowright'))yaw-=dt*1.55;
   if(keys.has('arrowup'))pitch=Math.max(-.55,pitch-dt*.8);if(keys.has('arrowdown'))pitch=Math.min(.25,pitch+dt*.8);
   near=null;let dT=distance(player,terminal),dM=distance(player,monster);
@@ -279,7 +329,7 @@ const saveKey='rememory-apurf789-autosave-v2';
 const manualSaveKey='rememory-apurf789-manual-v2';
 const backupKey='rememory-apurf789-backup-v2';
 let lastSaveLabel='';
-function buildSaveData(){return {version:5,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y},kegareMemories,merchantTrades,conversationHistory}}
+function buildSaveData(){return {version:6,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y},kegareMemories,merchantTrades,conversationHistory,facilityRooms,gameTime,memoryLoanDue,memoryLoanTrustPenaltyApplied}}
 function save(manual=false){
  try{
   const data=JSON.stringify(buildSaveData());
@@ -298,8 +348,8 @@ function load(){
  for(const [label,key] of candidates){
   try{
    const raw=localStorage.getItem(key);if(!raw)continue;
-   const s=JSON.parse(raw);if(!s||![2,3,4,5].includes(s.version)||typeof s.energy!=='number'||!s.player||typeof s.player.x!=='number'||typeof s.player.z!=='number')continue;
-   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;kegareMemories=s.kegareMemories??0;merchantTrades=s.merchantTrades??0;conversationHistory=s.conversationHistory??{};if(s.rover){rover.position.set(s.rover.x,s.rover.y??0,s.rover.z);rover.rotation.y=s.rover.rotation??0}lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
+   const s=JSON.parse(raw);if(!s||![2,3,4,5,6].includes(s.version)||typeof s.energy!=='number'||!s.player||typeof s.player.x!=='number'||typeof s.player.z!=='number')continue;
+   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;kegareMemories=s.kegareMemories??0;merchantTrades=s.merchantTrades??0;conversationHistory=s.conversationHistory??{};facilityRooms=s.facilityRooms??{};gameTime=s.gameTime??0;memoryLoanDue=s.memoryLoanDue??0;memoryLoanTrustPenaltyApplied=!!s.memoryLoanTrustPenaltyApplied;if(s.rover){rover.position.set(s.rover.x,s.rover.y??0,s.rover.z);rover.rotation.y=s.rover.rotation??0}lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
   }catch(err){continue;}
  }
  lastSaveLabel='セーブデータなし';
