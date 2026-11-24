@@ -218,6 +218,8 @@ function openBase(){
   document.getElementById('baseParty').onclick=openCompanions;
  });
 }
+const rarityRates=[{id:'N',rate:50},{id:'R',rate:30},{id:'SR',rate:14},{id:'SSR',rate:5},{id:'UR',rate:1}];
+function rollRarity(){let n=Math.random()*100;for(const r of rarityRates){n-=r.rate;if(n<0)return r.id}return 'N'}
 function openGacha(){
  const rates=rarityRates.map(r=>r.id+' '+r.rate+'%').join(' / ');
  const owned=companions.length?companions.map(p=>p.name+'（'+(p.rarity||'N')+'）').join('、'):'発見済みの仲間なし';
