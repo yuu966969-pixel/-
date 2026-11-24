@@ -109,6 +109,21 @@ const npcMarker= new THREE.Group();npcMarker.position.copy(npcPos);scene.add(npc
 const npcBody=new THREE.Mesh(new THREE.CapsuleGeometry(.38,.8,4,7),mat(0x52666a));npcBody.position.y=1;npcMarker.add(npcBody);
 const npcHead=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),mat(0xb9a58f));npcHead.position.y=1.7;npcMarker.add(npcHead);
 const npcMouth=new THREE.Mesh(new THREE.SphereGeometry(.075,10,8),mat(0x241719));npcMouth.scale.set(1,.35,.35);npcMouth.position.set(0,1.65,.235);npcMarker.add(npcMouth);const npcTeeth=new THREE.Mesh(new THREE.BoxGeometry(.085,.025,.018),mat(0xe7e2d5));npcTeeth.position.set(0,1.67,.27);npcTeeth.visible=false;npcMarker.add(npcTeeth);let npcTalkUntil=0;const npcLamp=new THREE.PointLight(0x8bdac8,1.6,8);npcLamp.position.y=2.2;npcMarker.add(npcLamp);
+
+/* Additional survivors and memory-crystal discoveries; none are present at the starting facility. */
+const survivorMarkers=[
+ {id:'ren',name:'レン',role:'防衛',position:new THREE.Vector3(-48,0,-36),memory:'崩れた防壁を守り続けた記憶',value:19,color:0x687d83},
+ {id:'yui',name:'ユイ',role:'解析',position:new THREE.Vector3(46,0,-49),memory:'星空の観測記録',value:22,color:0x8a7188}
+];
+for(const survivor of survivorMarkers){const g=new THREE.Group();g.position.copy(survivor.position);scene.add(g);const coat=new THREE.Mesh(new THREE.CapsuleGeometry(.36,.82,4,7),mat(survivor.color));coat.position.y=1;g.add(coat);const face=new THREE.Mesh(new THREE.SphereGeometry(.24,10,8),mat(0xb8a58f));face.position.y=1.68;g.add(face);const beacon=new THREE.Mesh(new THREE.OctahedronGeometry(.18),glow);beacon.position.y=2.35;g.add(beacon);survivor.group=g;}
+let collectedCrystals=[];
+const memoryCrystals=[
+ {id:'crystal-observatory',name:'観測塔の記憶結晶',position:new THREE.Vector3(0,0,-55),memory:'観測塔から見たAPURF789の夜空',value:14},
+ {id:'crystal-transit',name:'旧交通区画の記憶結晶',position:new THREE.Vector3(29,0,-8),memory:'人々が行き交った旧交通区画',value:17},
+ {id:'crystal-shelter',name:'避難区画の記憶結晶',position:new THREE.Vector3(-54,0,-60),memory:'避難所に残された小さな約束',value:20}
+];
+for(const crystal of memoryCrystals){const g=new THREE.Group();g.position.copy(crystal.position);scene.add(g);const shard=new THREE.Mesh(new THREE.OctahedronGeometry(.62),new THREE.MeshStandardMaterial({color:0x8ad8d1,emissive:0x246c70,emissiveIntensity:1.4,metalness:.35,roughness:.2}));shard.position.y=1.05;g.add(shard);const ring=new THREE.Mesh(new THREE.TorusGeometry(.85,.035,6,24),glow);ring.rotation.x=Math.PI/2;ring.position.y=.12;g.add(ring);crystal.group=g;}
+
 const baseMarker=new THREE.Group();baseMarker.position.copy(basePos);scene.add(baseMarker);
 /* Strange itinerant traders who refine Kegare memories into temporal energy. */
 const merchants=[{id:'ash',name:'灰冠の商人',position:new THREE.Vector3(-38,0,-24),rate:18,description:'灰色の布を幾重にもまとい、声の代わりに古い記録音を流す。'},{id:'bell',name:'鈴鳴りの商人',position:new THREE.Vector3(35,0,-16),rate:22,description:'壊れた鈴を鳴らし、穢れの記憶に残る時間の響きを聞き分ける。'},{id:'mask',name:'仮面の商人',position:new THREE.Vector3(4,0,-68),rate:26,description:'顔のない仮面をつけ、記憶を小さな黒い結晶へ封じている。'}];
@@ -259,6 +274,25 @@ function openMenu(){menu=true;researchMenu=false;overlay.classList.remove('hidde
 
 function interact(){
  if(!started||menu)return;
+ if(near&&near.startsWith('survivor:')){
+  const id=near.slice(9),survivor=survivorMarkers.find(x=>x.id===id);
+  if(!survivor||storyFlags[id])return;
+  storyFlags[id]=true;survivor.group.visible=false;
+  companions.push({id:'ally-'+id,name:survivor.name,level:1,role:survivor.role,trust:4,talkCount:0,rarity:'N'});
+  memories.push({id:'memory-'+id,name:survivor.memory,value:survivor.value,available:true});
+  credits+=35;scrap+=7;objective.textContent='生存者たちの情報を集め、基地を拡張する';
+  say(survivor.name+'と遭遇。'+survivor.memory+'を共有し、仲間として登録されました。');
+  addXP(18);save();return;
+ }
+ if(near&&near.startsWith('crystal:')){
+  const id=near.slice(8),crystal=memoryCrystals.find(x=>x.id===id);
+  if(!crystal||collectedCrystals.includes(id))return;
+  collectedCrystals.push(id);crystal.group.visible=false;
+  memories.push({id:crystal.id,name:crystal.memory,value:crystal.value,available:true});
+  energy=Math.min(100,energy+5);scrap+=4;credits+=12;
+  say('記憶結晶を回収：'+crystal.name+'。'+crystal.memory+'の断片がアーカイブに追加されました。');
+  updateHUD();addXP(10);save();return;
+ }
  if(near==='vehicle'){driving=!driving;if(driving){player.visible=false;player.position.copy(rover.position);say('N.O.V.A.：回収用ローバーを起動。WASDで走行、矢印キーで進行方向を調整できます。');}else{player.visible=true;player.position.copy(rover.position).add(new THREE.Vector3(2,0,0));say('ローバーから降りました。');}return;}
  if(near==='npc'){npcTalkUntil=performance.now()+9000;if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測',trust:5,talkCount:0});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);save();}const mina=companions.find(p=>p.id==='ally-first');if(mina)openConversation({id:mina.id,name:mina.name,kind:'companion',role:mina.role,personality:'慎重だが好奇心が強い。主人公と出会ってから信頼を築いている。'});return;}
  if(near&&near.startsWith('merchant:')){const m=merchants.find(x=>x.id===near.slice(9));if(m)openMerchant(m);return;}
@@ -297,6 +331,7 @@ function animate(){
  requestAnimationFrame(animate);const dt=Math.min(clock.getDelta(),.04);
  if(started&&!menu){
   gameTime+=dt;
+  for(const survivor of survivorMarkers)survivor.group.visible=!storyFlags[survivor.id];for(const crystal of memoryCrystals)crystal.group.visible=!collectedCrystals.includes(crystal.id);
   const talking=performance.now()<npcTalkUntil;npcMouth.scale.y=talking?(0.25+Math.abs(Math.sin(performance.now()*.012))*.9):.12;npcTeeth.visible=talking&&npcMouth.scale.y>.55;
   if(borrowedMemory&&memoryLoanDue>0&&gameTime>memoryLoanDue&&!memoryLoanTrustPenaltyApplied){memoryLoanTrustPenaltyApplied=true;const lender=companions[0];if(lender)lender.trust=Math.max(0,(lender.trust||0)-8);say('N.O.V.A.：記憶の貸借期限を超過。貸し手との信頼が低下しました。返却は引き続き可能です。');save(false)}
   const forward=new THREE.Vector3(Math.sin(yaw),0,-Math.cos(yaw));
@@ -311,6 +346,8 @@ function animate(){
   else if(dM<4.5){near='monster';showPrompt(captured?'[ E ] 捕獲済み穢れを確認':(enemyHP<=0?'[ C ] 捕獲　[ E ] 観察':'[ E ] 観察　[ F ] 攻撃'))}
   else if(merchants.some(m=>player.position.distanceTo(m.position)<3.4)){const m=merchants.find(m=>player.position.distanceTo(m.position)<3.4);near='merchant:'+m.id;showPrompt('[ E ] '+m.name+'と取引する')}
   else if(player.position.distanceTo(rover.position)<3.5){near='vehicle';showPrompt(driving?'[ E ] ローバーから降りる':'[ E ] ローバーに乗る')}
+  else if(survivorMarkers.some(x=>!storyFlags[x.id]&&player.position.distanceTo(x.position)<3.2)){const survivor=survivorMarkers.find(x=>!storyFlags[x.id]&&player.position.distanceTo(x.position)<3.2);near='survivor:'+survivor.id;showPrompt('[ E ] '+survivor.name+'と話す')}
+  else if(memoryCrystals.some(x=>!collectedCrystals.includes(x.id)&&player.position.distanceTo(x.position)<3.2)){const crystal=memoryCrystals.find(x=>!collectedCrystals.includes(x.id)&&player.position.distanceTo(x.position)<3.2);near='crystal:'+crystal.id;showPrompt('[ E ] '+crystal.name+'を回収')}
   else if(player.position.distanceTo(npcPos)<3.2){near='npc';showPrompt('[ E ] 生存者と話す')}
   else if(player.position.distanceTo(basePos)<4){near='base';showPrompt(baseUnlocked?'[ E ] 基地を管理':'[ E ] 旧観測拠点を確保')}
   else hidePrompt();
@@ -331,7 +368,7 @@ const saveKey='rememory-apurf789-autosave-v2';
 const manualSaveKey='rememory-apurf789-manual-v2';
 const backupKey='rememory-apurf789-backup-v2';
 let lastSaveLabel='';
-function buildSaveData(){return {version:6,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y},kegareMemories,merchantTrades,conversationHistory,facilityRooms,gameTime,memoryLoanDue,memoryLoanTrustPenaltyApplied}}
+function buildSaveData(){return {version:6,savedAt:new Date().toISOString(),energy,corruption,scan,captured,terminalRead,weaponUnlocked,health,kegareData,enemyHP,enemyAlert,timeLevel,researchLevel,analysisUnlocked,objective:objective.textContent,player:{x:player.position.x,y:player.position.y,z:player.position.z},scrap,credits,playerLevel,playerXP,baseUnlocked,baseLevel,researchFacility,companions,party,memories,borrowedMemory,novaGrowth,novaTone,gachaCount,equipped,equipment,weaponPower,storyFlags,rover:{x:rover.position.x,y:rover.position.y,z:rover.position.z,rotation:rover.rotation.y},kegareMemories,merchantTrades,conversationHistory,facilityRooms,gameTime,memoryLoanDue,memoryLoanTrustPenaltyApplied,collectedCrystals}}
 function save(manual=false){
  try{
   const data=JSON.stringify(buildSaveData());
@@ -351,7 +388,7 @@ function load(){
   try{
    const raw=localStorage.getItem(key);if(!raw)continue;
    const s=JSON.parse(raw);if(!s||![2,3,4,5,6].includes(s.version)||typeof s.energy!=='number'||!s.player||typeof s.player.x!=='number'||typeof s.player.z!=='number')continue;
-   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;kegareMemories=s.kegareMemories??0;merchantTrades=s.merchantTrades??0;conversationHistory=s.conversationHistory??{};facilityRooms=s.facilityRooms??{};gameTime=s.gameTime??0;memoryLoanDue=s.memoryLoanDue??0;memoryLoanTrustPenaltyApplied=!!s.memoryLoanTrustPenaltyApplied;if(s.rover){rover.position.set(s.rover.x,s.rover.y??0,s.rover.z);rover.rotation.y=s.rover.rotation??0}lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
+   energy=s.energy;corruption=s.corruption??0;scan=!!s.scan;captured=!!s.captured;terminalRead=!!s.terminalRead;weaponUnlocked=!!s.weaponUnlocked;health=s.health??100;kegareData=s.kegareData??0;enemyHP=s.enemyHP??100;enemyAlert=!!s.enemyAlert;timeLevel=s.timeLevel??1;researchLevel=s.researchLevel??0;analysisUnlocked=!!s.analysisUnlocked;objective.textContent=s.objective||objective.textContent;player.position.set(s.player.x,s.player.y??0,s.player.z);scrap=s.scrap??scrap;credits=s.credits??credits;playerLevel=s.playerLevel??playerLevel;playerXP=s.playerXP??playerXP;baseUnlocked=!!s.baseUnlocked;baseLevel=s.baseLevel??baseLevel;researchFacility=s.researchFacility??0;companions=s.companions??[];party=s.party??[];memories=s.memories??memories;borrowedMemory=s.borrowedMemory??null;novaGrowth=s.novaGrowth??0;novaTone=s.novaTone??'標準';gachaCount=s.gachaCount??0;equipped=s.equipped??equipped;equipment=s.equipment??equipment;weaponPower=s.weaponPower??1;storyFlags=s.storyFlags??storyFlags;kegareMemories=s.kegareMemories??0;merchantTrades=s.merchantTrades??0;conversationHistory=s.conversationHistory??{};facilityRooms=s.facilityRooms??{};collectedCrystals=s.collectedCrystals??[];gameTime=s.gameTime??0;memoryLoanDue=s.memoryLoanDue??0;memoryLoanTrustPenaltyApplied=!!s.memoryLoanTrustPenaltyApplied;if(s.rover){rover.position.set(s.rover.x,s.rover.y??0,s.rover.z);rover.rotation.y=s.rover.rotation??0}lastSaveLabel='前回の保存（'+label+'）：'+(s.savedAt?new Date(s.savedAt).toLocaleString('ja-JP'):'日時不明');updateHUD();if(label!=='自動保存')say('N.O.V.A.：自動保存データを読み込めなかったため、'+label+'から復旧しました。');return;
   }catch(err){continue;}
  }
  lastSaveLabel='セーブデータなし';
