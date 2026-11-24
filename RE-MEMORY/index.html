@@ -98,8 +98,17 @@ const extraKegare=[
 ];
 for(const unit of extraKegare){const g=new THREE.Group();g.position.copy(unit.position);scene.add(g);const shell=new THREE.Mesh(new THREE.IcosahedronGeometry(unit.id==='drift'?1.25:.9,1),mat(unit.color));shell.position.y=1.1;g.add(shell);const shard=new THREE.Mesh(new THREE.TetrahedronGeometry(.42),glow);shard.position.set(.2,1.65,.45);g.add(shard);for(let n=0;n<3;n++){const spike=new THREE.Mesh(new THREE.ConeGeometry(.16,.9,5),mat(0x24282d));spike.position.set(Math.sin(n*2.1)*.75,1.2,Math.cos(n*2.1)*.65);spike.rotation.z=(n-1)*.55;g.add(spike)}unit.group=g;}
 
+/* Chapter finale boss: a large temporal Kegare unlocked through research and captures. */
+const finalBoss=new THREE.Group();finalBoss.position.set(66,0,-76);scene.add(finalBoss);
+const bossCore=new THREE.Mesh(new THREE.IcosahedronGeometry(2.2,2),mat(0x25232d,.45,.25));bossCore.position.y=2.5;bossCore.scale.set(.9,1.25,.85);finalBoss.add(bossCore);
+for(let n=0;n<8;n++){const blade=new THREE.Mesh(new THREE.ConeGeometry(.28,2.2,6),mat(0x45404b));const a=n*Math.PI/4;blade.position.set(Math.cos(a)*2,2.5+Math.sin(a)*.7,Math.sin(a)*2);blade.rotation.z=Math.cos(a)*.8;blade.rotation.x=Math.sin(a)*.7;finalBoss.add(blade)}
+const bossEye=new THREE.Mesh(new THREE.SphereGeometry(.36,12,10),new THREE.MeshStandardMaterial({color:0xb7e8df,emissive:0x4bb7a5,emissiveIntensity:2}));bossEye.position.set(0,2.6,1.75);finalBoss.add(bossEye);
+const bossAura=new THREE.PointLight(0x9a73c4,3,15);bossAura.position.y=3;finalBoss.add(bossAura);finalBoss.visible=false;
+
+
 let yaw=0,pitch=-.12,energy=64,corruption=0,started=false,menu=false,researchMenu=false,near=null,slowUntil=0,scan=false,captured=false,terminalRead=false,weaponUnlocked=false,health=100,kegareData=0,enemyHP=100,enemyAlert=false;
 let enemyRewarded=false,jumpVelocity=0,timeLevel=1,researchLevel=0,analysisUnlocked=false;
+let finalBossUnlocked=false,bossHP=260,bossAlert=false,bossDefeated=false,endingChoice='';
 const keys=new Set(),clock=new THREE.Clock();
 const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
 const objective=document.getElementById('objectiveText');
@@ -162,7 +171,7 @@ const facilityRoomLayout=[
 for(const [id,ox,oz] of facilityRoomLayout){
  const room=new THREE.Group();room.position.set(basePos.x+ox,0,basePos.z+oz);scene.add(room);
  const floorMesh=new THREE.Mesh(new THREE.BoxGeometry(4.6,.28,4.6),dark);floorMesh.position.y=.05;room.add(floorMesh);
- for(const [x,z,w,d] of [[0,-2.2,4.6,.2],[-2.2,0,.2,4.6],[2.2,0,.2,4.6],[0,2.2,4.6,.2]]){const wall=new THREE.Mesh(new THREE.BoxGeometry(w,2.8,d),stone);wall.position.set(x,1.45,z);room.add(wall)}
+ for(const [x,z,w,d] of [[0,-2.2,4.6,.2],[-2.2,0,.2,4.6],[2.2,0,.2,4.6],[-1.55,2.2,1.3,.2],[1.55,2.2,1.3,.2]]){const wall=new THREE.Mesh(new THREE.BoxGeometry(w,2.8,d),stone);wall.position.set(x,1.45,z);room.add(wall)}
  const roof=new THREE.Mesh(new THREE.BoxGeometry(4.7,.2,4.7),dark);roof.position.y=2.9;room.add(roof);
  const consoleMesh=new THREE.Mesh(new THREE.BoxGeometry(1.2,.9,.7),rust);consoleMesh.position.set(0,.65,0);room.add(consoleMesh);
  const indicator=new THREE.Mesh(new THREE.BoxGeometry(.5,.35,.06),glow);indicator.position.set(0,1.5,2.08);room.add(indicator);
@@ -239,15 +248,15 @@ const researchRooms=[
  {id:'archive',name:'資料庫',desc:'個体記録・研究ログ・弱点情報の保管',cost:42}
 ];
 function openResearchFacility(){
- const capturedCount=(captured?1:0)+extraKegare.filter(x=>x.captured).length;
+ const capturedCount=getCapturedCount();
  const built=researchRooms.filter(r=>facilityRooms&&facilityRooms[r.id]).map(r=>' <p>✓ '+r.name+'：'+r.desc+'</p>').join('');
  const next=researchRooms.find(r=>!facilityRooms||!facilityRooms[r.id]);
  const action=next?'<p>次の設備：'+next.name+' / 資材 '+next.cost+'</p><button class="menuitem" id="buildResearchRoom">次の研究室を修復</button>':'<p>全研究室の修復が完了しました。研究データを統合できます。</p><button class="menuitem" id="integrateResearch">研究データを統合（穢れデータ2・エネルギー8）</button>';
  systemMenu('穢れ研究施設','<p>捕獲数：'+(captured?1:0)+'　研究段階：'+researchFacility+'　資材：'+scrap+'</p><p>研究設備は廃墟の区画を順に再稼働させます。</p>'+built+action+'<p class="small">全モンスターは穢れに分類。研究は非侵襲的な観察・記録・能力検証を中心に行います。</p>',()=>{
   const build=document.getElementById('buildResearchRoom');
-  if(build)build.onclick=()=>{if(!baseUnlocked){say('N.O.V.A.：先に旧観測拠点を確保してください。');return}if(capturedCount<1){say('N.O.V.A.：研究室の修復には穢れの捕獲が必要です。');return}if(scrap<next.cost){say('N.O.V.A.：資材が不足しています。');return}scrap-=next.cost;facilityRooms=facilityRooms||{};facilityRooms[next.id]=true;researchFacility++;researchLevel++;say(next.name+'を修復しました。'+next.desc+'。');updateHUD();save();openResearchFacility()};
+  if(build)build.onclick=()=>{if(!baseUnlocked){say('N.O.V.A.：先に旧観測拠点を確保してください。');return}if(capturedCount<1){say('N.O.V.A.：研究室の修復には穢れの捕獲が必要です。');return}if(scrap<next.cost){say('N.O.V.A.：資材が不足しています。');return}scrap-=next.cost;facilityRooms=facilityRooms||{};facilityRooms[next.id]=true;researchFacility++;researchLevel++;say(next.name+'を修復しました。'+next.desc+'。');checkBossUnlock();updateHUD();save();openResearchFacility()};
   const integrate=document.getElementById('integrateResearch');
-  if(integrate)integrate.onclick=()=>{if(kegareData<2||energy<8){say('N.O.V.A.：研究資源が不足しています。');return}kegareData-=2;energy-=8;analysisUnlocked=true;timeLevel++;corruption=Math.max(0,corruption-6);say('研究統合完了。時間制御レベルと記憶耐性が向上しました。');updateHUD();save();openResearchFacility()};
+  if(integrate)integrate.onclick=()=>{if(kegareData<2||energy<8){say('N.O.V.A.：研究資源が不足しています。');return}kegareData-=2;energy-=8;analysisUnlocked=true;timeLevel++;corruption=Math.max(0,corruption-6);say('研究統合完了。時間制御レベルと記憶耐性が向上しました。');checkBossUnlock();updateHUD();save();openResearchFacility()};
  });
 }
 function openCompanions(){const roster=companions.length?companions.map((p,i)=>'<p>'+(i+1)+'. '+p.name+' / Lv.'+p.level+' / '+p.role+(party.includes(p.id)?' <strong>編成中</strong>':'')+' / 信頼 '+(p.trust||0)+'</p><button class="menuitem" data-talk-ally="'+p.id+'">'+p.name+'と自由に会話する</button>').join(''):'<p>仲間はまだいません。開始地点に仲間はいません。外の世界で出会う必要があります。</p>';systemMenu('仲間・パーティー','<p>主人公 Lv.'+playerLevel+'（固定枠・解除不可）　経験値 '+playerXP+'/'+(playerLevel*40)+'</p>'+roster+'<p>編成人数：'+(party.length+1)+' / 4（主人公を含む）</p><button class="menuitem" id="toggleParty">仲間の編成を切り替える</button><button class="menuitem" id="trainParty">編成中の仲間を育成（資材8）</button>',()=>{document.querySelectorAll('[data-talk-ally]').forEach(b=>b.onclick=()=>{const p=companions.find(x=>x.id===b.dataset.talkAlly);if(p)openConversation({id:p.id,name:p.name,kind:'companion',role:p.role,personality:'仲間。経験や信頼関係に応じて少しずつ本音を話す。'})});document.getElementById('toggleParty').onclick=()=>{if(!companions.length){say('N.O.V.A.：仲間がいません。生存者との遭遇が必要です。');return}const p=companions[0];party=party.includes(p.id)?party.filter(x=>x!==p.id):party.length<3?[...party,p.id]:party;say(p.name+(party.includes(p.id)?'を編成しました。':'を待機に戻しました。'));save();openCompanions()};document.getElementById('trainParty').onclick=()=>{if(!companions.length||scrap<8){say('N.O.V.A.：育成対象または資材が不足しています。');return}scrap-=8;companions.forEach(p=>{if(party.includes(p.id))p.level++});save();openCompanions()}})}
@@ -297,8 +306,55 @@ function openGacha(){
   document.getElementById('upgradeGear').onclick=()=>{if(scrap<10){say('N.O.V.A.：資材不足です。');return}scrap-=10;weaponPower++;say('装備出力を強化しました。攻撃補正 Lv.'+weaponPower);save();openGacha()};
  });
 }
+
+function getCapturedCount(){return (captured?1:0)+extraKegare.filter(x=>x.captured).length}
+function updateQuest(){
+ const count=getCapturedCount(),rooms=researchRooms.filter(r=>facilityRooms&&facilityRooms[r.id]).length;
+ if(bossDefeated){objective.textContent='最終記録を選択し、クロノス計画の結末を確定する';return}
+ if(!terminalRead){objective.textContent='施設の制御端末を調べる';return}
+ if(!scan){objective.textContent='最初の穢れを観察し、データを取得する';return}
+ if(count<1){objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';return}
+ if(!storyFlags.survivor){objective.textContent='施設外で生存者の反応を探す';return}
+ if(!baseUnlocked){objective.textContent='旧観測拠点を確保する';return}
+ if(rooms<6){objective.textContent='基地の穢れ研究施設を修復する（'+rooms+'/6）';return}
+ if(!analysisUnlocked){objective.textContent='捕獲した穢れの記憶構造を解析する';return}
+ if(!finalBossUnlocked){objective.textContent='外縁部の時間異常を調査する';return}
+ objective.textContent='時間異常の中心にいる大型穢れを討伐する';
+}
+function checkBossUnlock(){
+ if(!finalBossUnlocked&&baseUnlocked&&getCapturedCount()>=2&&researchRooms.every(r=>facilityRooms&&facilityRooms[r.id])&&analysisUnlocked){
+  finalBossUnlocked=true;finalBoss.visible=true;bossAlert=false;objective.textContent='外縁部の時間異常を調査する';say('N.O.V.A.：研究データを統合。外縁部に大型の時間異常反応を検出しました。大型穢れの位置をマップへ登録します。');save(false);
+ }
+ updateQuest();
+}
+function openQuestLog(){
+ const tasks=[
+  ['制御端末の記録',terminalRead?'完了':'未完了'],
+  ['穢れの観察',scan?'完了':'未完了'],
+  ['穢れの捕獲',getCapturedCount()+' / 3'],
+  ['生存者との遭遇',storyFlags.survivor?'完了':'未完了'],
+  ['旧観測拠点の確保',baseUnlocked?'完了':'未完了'],
+  ['研究室の修復',researchRooms.filter(r=>facilityRooms&&facilityRooms[r.id]).length+' / 6'],
+  ['記憶構造の解析',analysisUnlocked?'完了':'未完了'],
+  ['外縁部の大型穢れ',bossDefeated?'討伐済み':finalBossUnlocked?'出現':'未発見']
+ ];
+ const rows=tasks.map(([n,v])=>'<p>'+n+'：'+v+'</p>').join('');
+ systemMenu('任務記録 / CHAPTER 01',rows+'<p class="small">進行状況は自動更新されます。任務は複数の探索順序に対応します。</p>');
+}
+function openFinale(){
+ if(!bossDefeated){say('N.O.V.A.：大型穢れの活動停止を確認してから記録を復元してください。');return}
+ const available=memories.filter(m=>m.available&&!m.loaned);
+ const memoryOption=available.length?'<button class="menuitem" id="endingMemory">自分の記憶を一つ使い、時間の裂け目を閉じる</button>':'<p>利用可能な個人記憶がありません。</p>';
+ systemMenu('クロノス計画・最終記録','<p>大型穢れの活動停止により、APURF789の時間構造を修復する機会が生まれた。</p><p>選択は結末の記録に影響する。選択後もこの記録から別の結末を確認できる。</p>'+memoryOption+'<button class="menuitem" id="endingKegare">穢れデータとエネルギーで封印する（データ5・エネルギー25）</button><button class="menuitem" id="endingNova">N.O.V.A.の中核記録を使い、時間構造を安定させる</button><p>現在の結末記録：'+(endingChoice||'未選択')+'</p>',()=>{
+  const choose=(id,fn)=>{const b=document.getElementById(id);if(b)b.onclick=()=>{fn();save();openFinale()}};
+  choose('endingMemory',()=>{const m=memories.find(x=>x.available&&!x.loaned);if(!m){say('N.O.V.A.：利用可能な記憶がありません。');return}m.available=false;energy=Math.min(100,energy+m.value);endingChoice='記憶の代償 — 個人の記憶を一つ失い、裂け目を閉じた';say('記憶を時間エネルギーへ変換。失われた記憶の代わりに、惑星の時間構造が安定しました。')});
+  choose('endingKegare',()=>{if(kegareData<5||energy<25){say('N.O.V.A.：穢れデータ5とエネルギー25が必要です。');return}kegareData-=5;energy-=25;endingChoice='穢れの封印 — 捕獲データを利用し、個人の記憶を守った';say('穢れの記憶構造を逆位相へ変換。個人の記憶を消費せず、時間の裂け目を封印しました。')});
+  choose('endingNova',()=>{if(endingChoice==='N.O.V.A.の中核記録 — 安定化') {say('この結末はすでに記録されています。');return}endingChoice='N.O.V.A.の中核記録 — 安定化';novaGrowth+=5;say('N.O.V.A.：中核記録を開放。私の記録を時間安定化に使用します。あなたの記憶は保持されます。')});
+ });
+}
+
 function openStory(){systemMenu('クロノス計画・記録','<p>第一記録：APURF789は人類発祥の惑星であり、人類文明の故郷だった。</p><p>第二記録：クロノス計画は時間をエネルギーとして利用する研究から始まり、医療・災害対策にも応用された。</p><p>第三記録：計画は兵器転用され、核戦争と時間兵器の同時使用で惑星の時間構造が崩壊。</p><p>第四記録：主人公は戦争当時12歳。保護施設で本人にとって8年を過ごし、20歳で目覚めた。外界では数億年が経過した。</p><p>復元済み記録：'+Object.values(storyFlags).filter(Boolean).length+' / 7</p><button class="menuitem" id="restoreChronos">破損ログを追加解析</button>',()=>{document.getElementById('restoreChronos').onclick=()=>{if(energy<6){say('N.O.V.A.：解析エネルギーが不足しています。');return}energy-=6;storyFlags.chronos=true;novaGrowth++;updateHUD();say('N.O.V.A.：クロノス計画の追加ログを復元。時間逆行実験が都市全域に影響した記録を確認しました。');save();openStory()}})}
-function openMenu(){menu=true;researchMenu=false;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久 '+health+'/100　エネルギー '+energy+'　侵食 '+corruption+'%　Lv.'+playerLevel+'</p><p>資材 '+scrap+'　クレジット '+credits+'　基地 '+(baseUnlocked?'確保済み':'未確保')+'　仲間 '+companions.length+'人</p><button class="menuitem" id="mStory">① クロノス計画・ストーリー記録</button><button class="menuitem" id="mNova">② N.O.V.A.と会話</button><button class="menuitem" id="mMemory">③ 記憶アーカイブ・変換</button><button class="menuitem" id="mResearch">④ 穢れ研究施設</button><button class="menuitem" id="mParty">⑤ 仲間・編成・育成</button><button class="menuitem" id="mBase">⑥ 基地運営</button><button class="menuitem" id="mGacha">⑦ 召集・装備</button><section><h3>設定 / データ管理</h3><p id="saveStatus" class="small">'+(lastSaveLabel||'セーブデータ未作成')+'</p><button id="saveButton" class="menuitem">手動セーブ</button></section><button id="resume" class="menuitem">Enter — ゲームに戻る</button><p class="small">↑ ↓：選択　Enter：決定　Tab / Esc：戻る</p>';const bind=(id,fn)=>document.getElementById(id).onclick=fn;bind('mStory',openStory);bind('mNova',openNova);bind('mMemory',openMemory);bind('mResearch',openResearchFacility);bind('mParty',openCompanions);bind('mBase',openBase);bind('mGacha',openGacha);bind('resume',closeMenu);bind('saveButton',()=>save(true));document.getElementById('mStory').focus()}
+function openMenu(){menu=true;researchMenu=false;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">SYSTEM MENU / STATUS</div><h2>システムメニュー</h2><p>耐久 '+health+'/100　エネルギー '+energy+'　侵食 '+corruption+'%　Lv.'+playerLevel+'</p><p>資材 '+scrap+'　クレジット '+credits+'　基地 '+(baseUnlocked?'確保済み':'未確保')+'　仲間 '+companions.length+'人</p><button class="menuitem" id="mStory">① クロノス計画・ストーリー記録</button><button class="menuitem" id="mQuest">② 任務記録・章の進行</button><button class="menuitem" id="mNova">② N.O.V.A.と会話</button><button class="menuitem" id="mMemory">③ 記憶アーカイブ・変換</button><button class="menuitem" id="mResearch">④ 穢れ研究施設</button><button class="menuitem" id="mParty">⑤ 仲間・編成・育成</button><button class="menuitem" id="mBase">⑥ 基地運営</button><button class="menuitem" id="mGacha">⑦ 召集・装備</button><section><h3>設定 / データ管理</h3><p id="saveStatus" class="small">'+(lastSaveLabel||'セーブデータ未作成')+'</p><button id="saveButton" class="menuitem">手動セーブ</button></section><button id="resume" class="menuitem">Enter — ゲームに戻る</button><p class="small">↑ ↓：選択　Enter：決定　Tab / Esc：戻る</p>';const bind=(id,fn)=>document.getElementById(id).onclick=fn;bind('mStory',openStory);bind('mQuest',openQuestLog);bind('mNova',openNova);bind('mMemory',openMemory);bind('mResearch',openResearchFacility);bind('mParty',openCompanions);bind('mBase',openBase);bind('mGacha',openGacha);bind('resume',closeMenu);bind('saveButton',()=>save(true));document.getElementById('mStory').focus()}
 
 function interact(){
  if(!started||menu)return;
@@ -314,7 +370,7 @@ function interact(){
   memories.push({id:'memory-'+id,name:survivor.memory,value:survivor.value,available:true});
   credits+=35;scrap+=7;objective.textContent='生存者たちの情報を集め、基地を拡張する';
   say(survivor.name+'と遭遇。'+survivor.memory+'を共有し、仲間として登録されました。');
-  addXP(18);save();return;
+  addXP(18);updateQuest();save();return;
  }
  if(near&&near.startsWith('crystal:')){
   const id=near.slice(8),crystal=memoryCrystals.find(x=>x.id===id);
@@ -326,13 +382,13 @@ function interact(){
   updateHUD();addXP(10);save();return;
  }
  if(near==='vehicle'){driving=!driving;if(driving){player.visible=false;player.position.copy(rover.position);say('N.O.V.A.：回収用ローバーを起動。WASDで走行、矢印キーで進行方向を調整できます。');}else{player.visible=true;player.position.copy(rover.position).add(new THREE.Vector3(2,0,0));say('ローバーから降りました。');}return;}
- if(near==='npc'){npcTalkUntil=performance.now()+9000;if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測',trust:5,talkCount:0});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);save();}const mina=companions.find(p=>p.id==='ally-first');if(mina)openConversation({id:mina.id,name:mina.name,kind:'companion',role:mina.role,personality:'慎重だが好奇心が強い。主人公と出会ってから信頼を築いている。'});return;}
+ if(near==='npc'){npcTalkUntil=performance.now()+9000;if(!storyFlags.survivor){storyFlags.survivor=true;companions.push({id:'ally-first',name:'ミナ',level:1,role:'観測',trust:5,talkCount:0});memories.push({id:'mina-trust',name:'ミナが託した記憶',value:16,available:true});credits+=40;scrap+=8;objective.textContent='確保した基地を整備する';say('生存者ミナと遭遇。警戒を解き、行動を共にすることになった。ミナは開始時からいた仲間ではない。');addXP(20);updateQuest();save();}const mina=companions.find(p=>p.id==='ally-first');if(mina)openConversation({id:mina.id,name:mina.name,kind:'companion',role:mina.role,personality:'慎重だが好奇心が強い。主人公と出会ってから信頼を築いている。'});return;}
  if(near&&near.startsWith('merchant:')){const m=merchants.find(x=>x.id===near.slice(9));if(m)openMerchant(m);return;}
- if(near==='base'){if(!baseUnlocked){baseUnlocked=true;baseLevel=1;storyFlags.base=true;objective.textContent='基地の設備を整え、穢れの記録を解析する';scrap+=10;say('N.O.V.A.：旧観測拠点を確保。司令室と基本保管庫を起動しました。穢れ研究設備は段階的に修復可能です。');save();}else openBase();return;}
+ if(near==='base'){if(!baseUnlocked){baseUnlocked=true;baseLevel=1;storyFlags.base=true;objective.textContent='基地の設備を整え、穢れの記録を解析する';checkBossUnlock();scrap+=10;say('N.O.V.A.：旧観測拠点を確保。司令室と基本保管庫を起動しました。穢れ研究設備は段階的に修復可能です。');save();}else openBase();return;}
  if(near==='terminal'&&terminalRead){openResearch();return;}
- if(near==='terminal'){terminalRead=true;weaponUnlocked=true;energy=Math.min(100,energy+12);updateHUD();say('N.O.V.A.：記録を復元。クロノス計画は平和利用から兵器転用されました。端末の保管庫から旧式の穢れ捕獲ビーコンを回収。');objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';terminal.material=glow;save(false);return}
+ if(near==='terminal'){terminalRead=true;weaponUnlocked=true;energy=Math.min(100,energy+12);updateHUD();say('N.O.V.A.：記録を復元。クロノス計画は平和利用から兵器転用されました。端末の保管庫から旧式の穢れ捕獲ビーコンを回収。');objective.textContent='穢れを弱らせ、捕獲ビーコンで回収する';terminal.material=glow;updateQuest();save(false);return}
  if(near==='monster'){
-  if(!scan){scan=true;kegareData+=1;enemyAlert=true;updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。全モンスターは穢れに属します。時間異常由来の変異体です。観察データを取得しました。');objective.textContent='制御端末から捕獲ビーコンを回収する';save(false);}
+  if(!scan){scan=true;storyFlags.firstKegare=true;kegareData+=1;enemyAlert=true;updateHUD();say('N.O.V.A.：対象を「穢れ」と分類。全モンスターは穢れに属します。時間異常由来の変異体です。観察データを取得しました。');updateQuest();save(false);}
   else if(captured){say('N.O.V.A.：捕獲済み個体です。基地の穢れ研究施設が稼働すれば詳細解析が可能になります。');}
   else if(!weaponUnlocked){say('N.O.V.A.：捕獲装置がありません。先に制御端末を調べてください。');}
   else {say('N.O.V.A.：対象の安定化を確認。Cキーで捕獲ビーコンを使用できます。');}
@@ -354,8 +410,8 @@ addEventListener('keydown',e=>{
  if(e.key.toLowerCase()==='e')interact();
  if(e.key.toLowerCase()==='f'&&started&&near==='monster'&&!captured){enemyHP=Math.max(0,enemyHP-35);say('攻撃命中。穢れの活動が弱まっています（残存活動 '+enemyHP+'%）。');if(enemyHP===0&&!enemyRewarded){enemyRewarded=true;say('N.O.V.A.：対象の活動停止を確認。Cキーで捕獲できます。');scrap+=6;credits+=10;addXP(12)}save(false);}
  if(e.key.toLowerCase()==='f'&&started&&near&&near.startsWith('kegare:')){const unit=extraKegare.find(x=>x.id===activeKegareId);if(unit&&!unit.captured){unit.hp=Math.max(0,unit.hp-35);unit.alert=true;say(unit.name+'への攻撃が命中。活動値 '+unit.hp+'/'+unit.maxHp+'。');if(unit.hp===0&&!unit.rewarded){unit.rewarded=true;scrap+=unit.id==='drift'?12:8;credits+=unit.id==='drift'?18:12;addXP(unit.id==='drift'?24:16);say('N.O.V.A.：'+unit.name+'の活動停止を確認。Cキーで捕獲できます。')}updateHUD();save(false)}}
- if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;kegareMemories+=1;energy=Math.min(100,energy+10);updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';save(false);}}
- if(e.key.toLowerCase()==='c'&&started&&near&&near.startsWith('kegare:')){const unit=extraKegare.find(x=>x.id===activeKegareId);if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(unit&&unit.hp>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else if(unit&&!unit.captured){unit.captured=true;unit.alert=false;unit.group.visible=false;kegareData+=3;kegareMemories+=1;energy=Math.min(100,energy+10);updateHUD();say(unit.name+'を捕獲しました。穢れ研究施設で個体記録を解析できます。');save(false)}}
+ if(e.key.toLowerCase()==='c'&&started&&near==='monster'&&!captured){if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(enemyHP>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else{captured=true;kegareData+=3;kegareMemories+=1;energy=Math.min(100,energy+10);checkBossUnlock();updateHUD();say('捕獲成功。穢れ個体を仮想収容コンテナに転送しました。研究施設の完成後に解析できます。');objective.textContent='施設外周の探索を続ける';save(false);}}
+ if(e.key.toLowerCase()==='c'&&started&&near&&near.startsWith('kegare:')){const unit=extraKegare.find(x=>x.id===activeKegareId);if(!weaponUnlocked)say('N.O.V.A.：捕獲ビーコン未取得。制御端末を先に調べてください。');else if(unit&&unit.hp>0)say('N.O.V.A.：対象が不安定です。Fキーで活動を弱めてください。');else if(unit&&!unit.captured){unit.captured=true;unit.alert=false;unit.group.visible=false;kegareData+=3;kegareMemories+=1;energy=Math.min(100,energy+10);checkBossUnlock();updateHUD();say(unit.name+'を捕獲しました。穢れ研究施設で個体記録を解析できます。');save(false)}}
  if(e.key.toLowerCase()==='q'&&started&&!menu&&energy>=8&&performance.now()>slowUntil){energy-=8;slowUntil=performance.now()+4200+(timeLevel-1)*1800;updateHUD();say('N.O.V.A.：局所時間制御を起動。穢れの移動速度と接近反応を抑制しています。')}
 });
 addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
