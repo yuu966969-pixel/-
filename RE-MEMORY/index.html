@@ -99,7 +99,7 @@ const extraKegare=[
 for(const unit of extraKegare){const g=new THREE.Group();g.position.copy(unit.position);scene.add(g);const shell=new THREE.Mesh(new THREE.IcosahedronGeometry(unit.id==='drift'?1.25:.9,1),mat(unit.color));shell.position.y=1.1;g.add(shell);const shard=new THREE.Mesh(new THREE.TetrahedronGeometry(.42),glow);shard.position.set(.2,1.65,.45);g.add(shard);for(let n=0;n<3;n++){const spike=new THREE.Mesh(new THREE.ConeGeometry(.16,.9,5),mat(0x24282d));spike.position.set(Math.sin(n*2.1)*.75,1.2,Math.cos(n*2.1)*.65);spike.rotation.z=(n-1)*.55;g.add(spike)}unit.group=g;}
 
 let yaw=0,pitch=-.12,energy=64,corruption=0,started=false,menu=false,researchMenu=false,near=null,slowUntil=0,scan=false,captured=false,terminalRead=false,weaponUnlocked=false,health=100,kegareData=0,enemyHP=100,enemyAlert=false;
-let enemyRewarded=false;jumpVelocity=0,timeLevel=1,researchLevel=0,analysisUnlocked=false;
+let enemyRewarded=false,jumpVelocity=0,timeLevel=1,researchLevel=0,analysisUnlocked=false;
 const keys=new Set(),clock=new THREE.Clock();
 const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
 const objective=document.getElementById('objectiveText');
