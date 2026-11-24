@@ -55,7 +55,13 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js"}}</script>
 <script type="module">
 import * as THREE from 'three';
-const companionCatalog=await fetch(new URL('./data/companions.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('roster fetch failed');return r.json()}).then(d=>Array.isArray(d.companions)?d.companions:[]).catch(e=>{console.warn(e);return []});
+const fallbackCompanions=[
+ {id:'comp_001',name:'ミナ・セイル',rarity:'R',role:'斥候',weapon:'双短剣',signature_memory:'弟と交わした帰還の約束',skill:'残響ステップ',personality:'警戒心が強いが約束を守る',recruitment:'第一章・廃観測所で記憶片を探す',story_hook:'弟の記憶が別の生存者に残る'},
+ {id:'comp_002',name:'ガラン・ヴォルク',rarity:'SR',role:'重装守衛',weapon:'大盾・片手剣',signature_memory:'避難民を守り切れなかった夜',skill:'最後の防壁',personality:'寡黙で責任感が強い',recruitment:'第一章・崩落トンネルの救助',story_hook:'守れなかった人々の記録を追う'},
+ {id:'comp_003',name:'ユノ・アステル',rarity:'R',role:'技術士',weapon:'パルスピストル',signature_memory:'初めて修理した古いラジオ',skill:'即席オーバークロック',personality:'好奇心旺盛で話好き',recruitment:'第一章・廃通信塔の復旧',story_hook:'ラジオに古い放送が混線する'},
+ {id:'comp_004',name:'セト・カイレン',rarity:'SR',role:'剣士',weapon:'片刃剣',signature_memory:'師匠から教わった型',skill:'返し太刀',personality:'礼儀正しく負けず嫌い',recruitment:'第一章・旧訓練区画',story_hook:'師匠は穢れ化した人間だった可能性'}
+];
+const companionCatalog=await fetch(new URL('./data/companions.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('roster fetch failed');return r.json()}).then(d=>Array.isArray(d.companions)&&d.companions.length?d.companions:fallbackCompanions).catch(e=>{console.warn(e);return fallbackCompanions});
 const mount=document.getElementById('game');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x22292e);scene.fog=new THREE.FogExp2(0x22292e,.014);
 const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,260);
