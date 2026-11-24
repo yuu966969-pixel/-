@@ -323,12 +323,9 @@ function openGacha(){
    if(credits<60){say('N.O.V.A.：クレジット不足です。');return}
    credits-=60;gachaCount++;const rarity=rollRarity();
    const target=companions[Math.floor(Math.random()*companions.length)];
-   target.rarity=target.rarity||rarity;
-   if(rarity==='UR'||rarity==='SSR'||rarity==='SR')target.trust=Math.min(100,(target.trust||0)+(rarity==='UR'?12:rarity==='SSR'?8:5));
-   else target.trust=Math.min(100,(target.trust||0)+2);
-   if(target.lastResonance){target.level=(target.level||1)+1;scrap+=rarity==='UR'?18:rarity==='SSR'?12:8;say(rarity+' 共鳴重複：'+target.name+'のレベルが上昇。資材も獲得しました。')}
-   else{target.lastResonance=true;say(rarity+' 共鳴記録：'+target.name+'との連携データを強化しました。')}
-   target.resonance=(target.resonance||0)+1;updateHUD();save();openGacha();
+   const rank={N:0,R:1,SR:2,SSR:3,UR:4},current=target.rarity||'N';
+   if(rank[rarity]>rank[current]){target.rarity=rarity;target.maxLevel=rarity==='UR'?60:rarity==='SSR'?50:rarity==='SR'?40:rarity==='R'?30:20;target.trait=rarity==='UR'?'時間共鳴':rarity==='SSR'?'記憶耐性':rarity==='SR'?'高速反応':rarity==='R'?'生存本能':'基礎適応';target.trust=Math.min(100,(target.trust||0)+10);target.level=Math.min(target.maxLevel||30,(target.level||1)+1);say(rarity+' 共鳴進化：'+target.name+'のレアリティが '+current+' から '+rarity+' へ上昇。固有特性「'+target.trait+'」を獲得しました。')}
+   else{target.resonance=(target.resonance||0)+1;target.trust=Math.min(100,(target.trust||0)+3);const cap=target.maxLevel||30;if((target.level||1)<cap){target.level=(target.level||1)+1;say(rarity+' 共鳴重複：'+target.name+'のレベルが上昇。')}else{scrap+=rarity==='UR'?18:rarity==='SSR'?12:rarity==='SR'?8:5;say(rarity+' 共鳴重複：育成上限のため資材へ変換しました。')}}updateHUD();save();openGacha();
   };
   document.getElementById('drawGear').onclick=()=>{
    if(credits<40){say('N.O.V.A.：クレジット不足です。');return}
