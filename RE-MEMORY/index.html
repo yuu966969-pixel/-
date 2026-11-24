@@ -197,6 +197,9 @@ function escapeChat(t){return String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 let conversationHistory={};
 function characterReply(p,q){
  const s=q.toLowerCase();
+ const linked=p.kind==='companion'?companions.find(x=>x.id===p.id):null;
+ if(linked&&(linked.trust||0)<18)return '……今はその話をしたくない。あなたが私から奪ったものを、まだ受け止めきれていない。';
+ if(linked&&Array.isArray(linked.memories)&&linked.memories.length===1)return '最近、昔のことを思い出せなくなってきた。残っている記憶だけは、失いたくない。';
  if(p.kind==='nova')return novaReply(q);
  if(/こんにちは|やあ|おはよう|こんばんは|元気/.test(s))return p.kind==='merchant'?'……客人から話しかけてくるとは珍しい。今日は何を知りたい？':'うん、話そう。何が気になっているの？';
  if(/クロノス|計画|技術者|研究所/.test(s)){
