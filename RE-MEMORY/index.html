@@ -57,14 +57,15 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
 import * as THREE from 'three';
 const companionCatalog=await fetch(new URL('./data/companions.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('roster fetch failed');return r.json()}).then(d=>Array.isArray(d.companions)?d.companions:[]).catch(e=>{console.warn(e);return []});
 const mount=document.getElementById('game');
-const scene=new THREE.Scene();scene.background=new THREE.Color(0x87949a);scene.fog=new THREE.FogExp2(0x87949a,.018);
+const scene=new THREE.Scene();scene.background=new THREE.Color(0x22292e);scene.fog=new THREE.FogExp2(0x22292e,.014);
 const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,260);
 const renderer=new THREE.WebGLRenderer({antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;mount.appendChild(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xb8c8cc,0x30383a,1.35));
-const sun=new THREE.DirectionalLight(0xffe2c1,2.2);sun.position.set(-28,42,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
+scene.add(new THREE.HemisphereLight(0x82939a,0x171a1c,.72));
+const sun=new THREE.DirectionalLight(0xc4a98b,.95);sun.position.set(-28,42,18);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);scene.add(sun);
 const mat=(c,r=.9,m=0)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
 const groundMat=mat(0x4a4e49),stone=mat(0x555b59),dark=mat(0x202a2d),rust=mat(0x725b49),glow= new THREE.MeshStandardMaterial({color:0x79d9c3,emissive:0x1a7867,emissiveIntensity:1.5});
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(220,220),groundMat);floor.rotation.x=-Math.PI/2;floor.position.y=-.08;floor.receiveShadow=true;scene.add(floor);
+const ashPositions=new Float32Array(720*3);for(let i=0;i<720;i++){ashPositions[i*3]=(Math.random()-.5)*190;ashPositions[i*3+1]=Math.random()*18;ashPositions[i*3+2]=(Math.random()-.5)*190}const ashGeometry=new THREE.BufferGeometry();ashGeometry.setAttribute('position',new THREE.BufferAttribute(ashPositions,3));const ashField=new THREE.Points(ashGeometry,new THREE.PointsMaterial({color:0x9aa5a4,size:.055,transparent:true,opacity:.32,depthWrite:false}));scene.add(ashField);
 function box(x,y,z,sx,sy,sz,material=stone,rot=0){const o=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),material);o.position.set(x,y,z);o.rotation.y=rot;o.castShadow=true;o.receiveShadow=true;scene.add(o);return o}
 function cylinder(x,y,z,rt,rb,h,material=stone){const o=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,7),material);o.position.set(x,y,z);o.castShadow=true;scene.add(o);return o}
 // Cracked, abandoned facility yard and collapsed structures.
@@ -82,6 +83,7 @@ const body=new THREE.Mesh(new THREE.CapsuleGeometry(.42,.85,5,8),mat(0x27363a));
 const head=new THREE.Mesh(new THREE.SphereGeometry(.28,12,10),mat(0xc0b5a3));head.position.y=1.88;head.castShadow=true;player.add(head);
 const visor=new THREE.Mesh(new THREE.BoxGeometry(.34,.09,.28),mat(0x182d31,.3,.4));visor.position.set(0,1.9,.19);player.add(visor);
 const pack=new THREE.Mesh(new THREE.BoxGeometry(.48,.55,.22),rust);pack.position.set(0,1.15,-.42);player.add(pack);
+const limbMat=mat(0x1c282c);const leftArm=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.48,4,6),limbMat);leftArm.position.set(-.48,1.08,0);player.add(leftArm);const rightArm=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.48,4,6),limbMat);rightArm.position.set(.48,1.08,0);player.add(rightArm);const leftLeg=new THREE.Mesh(new THREE.CapsuleGeometry(.15,.48,4,6),mat(0x182125));leftLeg.position.set(-.2,.35,0);player.add(leftLeg);const rightLeg=new THREE.Mesh(new THREE.CapsuleGeometry(.15,.48,4,6),mat(0x182125));rightLeg.position.set(.2,.35,0);player.add(rightLeg);
 player.position.set(0,0,3);
 const shadow=new THREE.Mesh(new THREE.CircleGeometry(.55,16),new THREE.MeshBasicMaterial({color:0x15191a,transparent:true,opacity:.35}));shadow.rotation.x=-Math.PI/2;shadow.position.y=.015;player.add(shadow);
 // First distant Kegare silhouette, classified as 穢れ.
@@ -447,6 +449,7 @@ function animate(){
   let move=new THREE.Vector3();
   if(keys.has('w'))move.add(forward);if(keys.has('s'))move.sub(forward);if(keys.has('d'))move.add(right);if(keys.has('a'))move.sub(right);
   if(move.lengthSq()>0){move.normalize();move.multiplyScalar(driving?(keys.has('shift')?13:8):(keys.has('shift')?8.2:5.2));if(driving){const candidate=rover.position.clone().addScaledVector(move,dt);if(Math.abs(candidate.x)<96&&Math.abs(candidate.z)<96&&candidate.distanceTo(basePos)>7&&candidate.distanceTo(new THREE.Vector3(0,0,-12))>3.2){rover.position.copy(candidate);rover.rotation.y=Math.atan2(move.x,move.z)}player.position.copy(rover.position);}else{const candidate=player.position.clone().addScaledVector(move,dt);if(Math.abs(candidate.x)<96&&Math.abs(candidate.z)<96&&candidate.distanceTo(new THREE.Vector3(0,0,-12))>1.25){player.position.copy(candidate);player.rotation.y=Math.atan2(move.x,move.z)}}}
+  const gait=move.lengthSq()>0&&!driving?Math.sin(performance.now()*.012)*.62:0;leftLeg.rotation.x=gait;rightLeg.rotation.x=-gait;leftArm.rotation.x=-gait*.7;rightArm.rotation.x=gait*.7;
   if(keys.has('arrowleft'))yaw+=dt*1.55;if(keys.has('arrowright'))yaw-=dt*1.55;
   if(keys.has('arrowup'))pitch=Math.max(-.55,pitch-dt*.8);if(keys.has('arrowdown'))pitch=Math.min(.25,pitch+dt*.8);
   near=null;let dT=distance(player,terminal),dM=distance(player,monster),dBoss=distance(player,finalBoss);
@@ -477,6 +480,7 @@ function animate(){
  for(let i=combatEffects.length-1;i>=0;i--){const fx=combatEffects[i];fx.life-=dt;fx.mesh.position.addScaledVector(fx.velocity,dt);fx.velocity.multiplyScalar(Math.max(0,1-dt*2.8));const t=Math.max(0,fx.life/fx.maxLife);if(fx.material&&'opacity'in fx.material)fx.material.opacity=t;if(fx.mesh.geometry.type==='TorusGeometry'||fx.mesh.geometry.type==='RingGeometry')fx.mesh.scale.multiplyScalar(1+dt*2.4);if(fx.life<=0){scene.remove(fx.mesh);fx.mesh.geometry.dispose();if(fx.material)fx.material.dispose();combatEffects.splice(i,1)}}
  const talking=performance.now()<npcTalkUntil;const minaMouthOpen=0.25+Math.abs(Math.sin(performance.now()*.012))*.9;npcMouth.scale.y=talking?minaMouthOpen:.12;npcTeeth.visible=talking&&minaMouthOpen>.55;
  for(const survivor of survivorMarkers){const blink=Math.pow(Math.max(0,Math.sin(performance.now()*.0015+survivor.position.x)),36);for(const eye of survivor.eyes)eye.scale.y=1-blink*.92;const open=.2+Math.abs(Math.sin(performance.now()*.014+survivor.position.z))*.8;survivor.mouth.scale.y=talking?open:.12;survivor.teeth.visible=talking&&open>.58;}
+ ashField.rotation.y+=dt*.0015;
  renderer.render(scene,camera);
 }
 animate();
