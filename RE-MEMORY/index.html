@@ -168,7 +168,7 @@ function playTone(freq=220,duration=.12,type='sine',volume=.035){
 const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
 const objective=document.getElementById('objectiveText');
 function say(t){log.textContent=t}
-function getWeaponInfo(label=equipped){const base=String(label||'').replace(/^(N|R|SR|SSR|UR)\\s+/,'');return weaponCatalog.find(w=>w.name===base)||fallbackWeapons[0]}
+function getWeaponInfo(label=equipped){const base=String(label||'').replace(/^(N|R|SR|SSR|UR)\s+/,'');return weaponCatalog.find(w=>w.name===base)||fallbackWeapons[0]}
 function getSpecialRequirement(){const type=getWeaponInfo().specialClass;return type==='heavy'?22:type==='easy'?46:33}
 function isCombatActive(){return (enemyAlert&&!captured&&enemyHP>0)||(bossAlert&&!bossDefeated&&bossHP>0)||extraKegare.some(x=>x.alert&&!x.captured&&x.hp>0)}
 function refreshSpecialGauge(){const panel=document.getElementById('specialGauge');if(!panel)return;const active=isCombatActive();if(!active)specialHits=0;const need=getSpecialRequirement(),count=Math.min(specialHits,need);panel.classList.toggle('active',active);panel.classList.toggle('ready',active&&specialHits>=need);document.getElementById('specialGaugeCount').textContent=count+' / '+need;document.getElementById('specialGaugeFill').style.width=(Math.min(100,count/need*100))+'%';document.getElementById('specialGaugeHint').textContent=specialHits>=need?'必殺技使用可能　G：発動':'攻撃を当ててゲージをためる　G：必殺技'}
@@ -364,7 +364,7 @@ function openGacha(){
  const rates=rarityRates.map(r=>r.id+' '+r.rate+'%').join(' / ');
  const owned=companions.length?companions.map(p=>p.name+'（'+(p.rarity||'N')+'）').join('、'):'発見済みの仲間なし';
  const gearList=equipment.map(x=>typeof x==='string'?x:x.name).join('、');
- const ownedWeapons=equipment.map(x=>typeof x==='string'?x:x.name).filter(x=>weaponCatalog.some(w=>String(x).replace(/^(N|R|SR|SSR|UR)\\s+/,'')===w.name));
+ const ownedWeapons=equipment.map(x=>typeof x==='string'?x:x.name).filter(x=>weaponCatalog.some(w=>String(x).replace(/^(N|R|SR|SSR|UR)\s+/,'')===w.name));
  const weaponButtons=ownedWeapons.map(x=>'<button class="menuitem" data-equip-weapon="'+escapeChat(x)+'">装備する：'+escapeChat(x)+'</button>').join('');
  const activeWeapon=getWeaponInfo();
  systemMenu('召集・装備','<p>所持クレジット：'+credits+'　抽選回数：'+gachaCount+'</p><p>レアリティ確率：'+rates+'</p><p class="small">確率は各抽選で独立。ゲーム内通貨のみで、現実のお金は使用しません。</p><p>発見済みの仲間：'+escapeChat(owned)+'</p><button class="menuitem" id="drawCharacter">発見済みの仲間と共鳴（60クレジット）</button><button class="menuitem" id="drawGear">武器を抽選（40クレジット・全100種類）</button><p>武器図鑑：'+weaponCatalog.length+'種類　所持：'+ownedWeapons.length+'種類</p><p>装備中：'+escapeChat(equipped)+' / '+escapeChat(activeWeapon.category)+' / 威力 '+weaponPower+' / 必殺技 '+getSpecialRequirement()+'回</p><p>所持武器から装備：</p>'+weaponButtons+'<button class="menuitem" id="upgradeGear">装備強化（資材10）</button><p class="small">重複した仲間は信頼・育成素材に変換。重複武器は強化素材になります。</p>',()=>{
