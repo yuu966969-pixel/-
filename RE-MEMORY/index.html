@@ -109,6 +109,7 @@ function performAttack(){
  const now=performance.now();if(now<attackReadyAt)return;
  const heavy=keys.has('shift');if(heavy&&energy<6){say('N.O.V.A.：強攻撃にはエネルギー6が必要です。');return}if(heavy)energy-=6;
  attackReadyAt=now+(heavy?720:390);comboStep=now-lastAttackAt<850?(comboStep%3)+1:1;lastAttackAt=now;spawnWeaponTrail(heavy);
+ if(near==='boss'&&!bossDefeated&&bossHP>0)bossAlert=true;else if(near==='monster'&&!captured&&enemyHP>0)enemyAlert=true;else if(near&&near.startsWith('kegare:')){const target=extraKegare.find(x=>x.id===activeKegareId);if(target&&!target.captured&&target.hp>0)target.alert=true}
  if(isCombatActive())specialHits=Math.min(getSpecialRequirement(),specialHits+1);
  const damage=(heavy?58:28+comboStep*5)*weaponPower*getPartyBonuses().damage;playTone(heavy?70:92,heavy ? .16 : .1,'sawtooth',heavy ? .04 : .025);updateHUD();
  if(near==='boss'&&!bossDefeated&&bossHP>0){bossAlert=true;bossHP=Math.max(0,bossHP-damage);spawnImpact(finalBoss,heavy);say((heavy?'強攻撃！':'攻撃命中！')+' 時喰らいに'+Math.round(damage)+'ダメージ。活動値 '+bossHP+'/260。');if(bossHP===0){scrap+=35;credits+=60;kegareData+=5;kegareMemories+=2;addXP(80);say('N.O.V.A.：時喰らいの活動停止を確認。Cキーでコアを封印してください。')}save(false);return}
@@ -167,7 +168,7 @@ const objective=document.getElementById('objectiveText');
 function say(t){log.textContent=t}
 function getSpecialRequirement(){const w=String(equipped||'');if(/高出力|重型|大剣|大型|重装|破砕/.test(w))return 22;if(/双短剣|短剣|軽量|パルスピストル|高速/.test(w))return 46;return 33}
 function isCombatActive(){return (enemyAlert&&!captured&&enemyHP>0)||(bossAlert&&!bossDefeated&&bossHP>0)||extraKegare.some(x=>x.alert&&!x.captured&&x.hp>0)}
-function refreshSpecialGauge(){const panel=document.getElementById('specialGauge');if(!panel)return;const active=isCombatActive(),need=getSpecialRequirement(),count=Math.min(specialHits,need);panel.classList.toggle('active',active);panel.classList.toggle('ready',active&&specialHits>=need);document.getElementById('specialGaugeCount').textContent=count+' / '+need;document.getElementById('specialGaugeFill').style.width=(Math.min(100,count/need*100))+'%';document.getElementById('specialGaugeHint').textContent=specialHits>=need?'必殺技使用可能　G：発動':'攻撃を当ててゲージをためる　G：必殺技'}
+function refreshSpecialGauge(){const panel=document.getElementById('specialGauge');if(!panel)return;const active=isCombatActive();if(!active)specialHits=0;const need=getSpecialRequirement(),count=Math.min(specialHits,need);panel.classList.toggle('active',active);panel.classList.toggle('ready',active&&specialHits>=need);document.getElementById('specialGaugeCount').textContent=count+' / '+need;document.getElementById('specialGaugeFill').style.width=(Math.min(100,count/need*100))+'%';document.getElementById('specialGaugeHint').textContent=specialHits>=need?'必殺技使用可能　G：発動':'攻撃を当ててゲージをためる　G：必殺技'}
 function updateHUD(){document.getElementById('energy').textContent=energy;document.getElementById('corruption').textContent=corruption;document.getElementById('vitals').textContent='耐久 '+health+' / 100　穢れデータ '+kegareData+'　記憶片 '+kegareMemories+'　捕獲装置 '+(weaponUnlocked?'有':'無')+'　資材 '+scrap+'　Lv.'+playerLevel;refreshSpecialGauge()}
 function showPrompt(t){prompt.textContent=t;prompt.classList.remove('hidden')}
 function hidePrompt(){prompt.classList.add('hidden')}
@@ -374,8 +375,8 @@ function openGacha(){
    if(credits<40){say('N.O.V.A.：クレジット不足です。');return}
    credits-=40;gachaCount++;const rarity=rollRarity();
    const pool=[
-    {name:'共鳴ブレード',type:'武器',power:2},{name:'時間安定装置',type:'補助',power:1},
-    {name:'記憶耐性コート',type:'防具',power:1},{name:'高出力パルス装置',type:'武器',power:3},
+    {name:'共鳴ブレード',type:'武器',power:2},{name:'重撃ハンマー',type:'武器',power:3},{name:'時間安定装置',type:'補助',power:1},
+    {name:'記憶耐性コート',type:'防具',power:1},{name:'高出力パルス装置',type:'武器',power:3},{name:'高速連射パルスピストル',type:'武器',power:2},{name:'双短剣',type:'武器',power:2},
     {name:'残響観測器',type:'解析',power:2},{name:'位相反転シールド',type:'防具',power:3}
    ];
    const item=pool[Math.floor(Math.random()*pool.length)],label=rarity+' '+item.name;
