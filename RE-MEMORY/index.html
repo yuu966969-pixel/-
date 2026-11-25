@@ -64,6 +64,8 @@ const fallbackCompanions=[
  {id:'comp_004',name:'セト・カイレン',rarity:'SR',role:'剣士',weapon:'片刃剣',signature_memory:'師匠から教わった型',skill:'返し太刀',personality:'礼儀正しく負けず嫌い',recruitment:'第一章・旧訓練区画',story_hook:'師匠は穢れ化した人間だった可能性'}
 ];
 const companionCatalog=await fetch(new URL('./data/companions.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('roster fetch failed');return r.json()}).then(d=>Array.isArray(d.companions)&&d.companions.length?d.companions:fallbackCompanions).catch(e=>{console.warn(e);return fallbackCompanions});
+const fallbackWeapons=[{id:'wp_000',name:'旧式パルス装置',category:'標準武器',specialClass:'standard',power:1,description:'旧式の標準武器。'}];
+const weaponCatalog=await fetch(new URL('./data/weapons.json',import.meta.url)).then(r=>{if(!r.ok)throw Error('weapon catalog fetch failed');return r.json()}).then(d=>Array.isArray(d.weapons)&&d.weapons.length===100?d.weapons:fallbackWeapons).catch(e=>{console.warn(e);return fallbackWeapons});
 const mount=document.getElementById('game');
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x22292e);scene.fog=new THREE.FogExp2(0x22292e,.014);
 const camera=new THREE.PerspectiveCamera(68,innerWidth/innerHeight,.1,260);
@@ -166,7 +168,8 @@ function playTone(freq=220,duration=.12,type='sine',volume=.035){
 const overlay=document.getElementById('overlay'),prompt=document.getElementById('prompt'),log=document.getElementById('log');
 const objective=document.getElementById('objectiveText');
 function say(t){log.textContent=t}
-function getSpecialRequirement(){const w=String(equipped||'');if(/高出力|重型|大剣|大型|重装|破砕/.test(w))return 22;if(/双短剣|短剣|軽量|パルスピストル|高速/.test(w))return 46;return 33}
+function getWeaponInfo(label=equipped){const base=String(label||'').replace(/^(N|R|SR|SSR|UR)\\s+/,'');return weaponCatalog.find(w=>w.name===base)||fallbackWeapons[0]}
+function getSpecialRequirement(){const type=getWeaponInfo().specialClass;return type==='heavy'?22:type==='easy'?46:33}
 function isCombatActive(){return (enemyAlert&&!captured&&enemyHP>0)||(bossAlert&&!bossDefeated&&bossHP>0)||extraKegare.some(x=>x.alert&&!x.captured&&x.hp>0)}
 function refreshSpecialGauge(){const panel=document.getElementById('specialGauge');if(!panel)return;const active=isCombatActive();if(!active)specialHits=0;const need=getSpecialRequirement(),count=Math.min(specialHits,need);panel.classList.toggle('active',active);panel.classList.toggle('ready',active&&specialHits>=need);document.getElementById('specialGaugeCount').textContent=count+' / '+need;document.getElementById('specialGaugeFill').style.width=(Math.min(100,count/need*100))+'%';document.getElementById('specialGaugeHint').textContent=specialHits>=need?'必殺技使用可能　G：発動':'攻撃を当ててゲージをためる　G：必殺技'}
 function updateHUD(){document.getElementById('energy').textContent=energy;document.getElementById('corruption').textContent=corruption;document.getElementById('vitals').textContent='耐久 '+health+' / 100　穢れデータ '+kegareData+'　記憶片 '+kegareMemories+'　捕獲装置 '+(weaponUnlocked?'有':'無')+'　資材 '+scrap+'　Lv.'+playerLevel;refreshSpecialGauge()}
@@ -361,7 +364,10 @@ function openGacha(){
  const rates=rarityRates.map(r=>r.id+' '+r.rate+'%').join(' / ');
  const owned=companions.length?companions.map(p=>p.name+'（'+(p.rarity||'N')+'）').join('、'):'発見済みの仲間なし';
  const gearList=equipment.map(x=>typeof x==='string'?x:x.name).join('、');
- systemMenu('召集・装備','<p>所持クレジット：'+credits+'　抽選回数：'+gachaCount+'</p><p>レアリティ確率：'+rates+'</p><p class="small">確率は各抽選で独立。ゲーム内通貨のみで、現実のお金は使用しません。</p><p>発見済みの仲間：'+escapeChat(owned)+'</p><button class="menuitem" id="drawCharacter">発見済みの仲間と共鳴（60クレジット）</button><button class="menuitem" id="drawGear">装備を抽選（40クレジット）</button><p>装備：'+escapeChat(gearList)+'　装備中：'+escapeChat(equipped)+'　強化Lv.'+weaponPower+'</p><button class="menuitem" id="upgradeGear">装備強化（資材10）</button><p class="small">重複した仲間は信頼・育成素材に変換。重複装備は強化素材になります。</p>',()=>{
+ const ownedWeapons=equipment.map(x=>typeof x==='string'?x:x.name).filter(x=>weaponCatalog.some(w=>String(x).replace(/^(N|R|SR|SSR|UR)\\s+/,'')===w.name));
+ const weaponButtons=ownedWeapons.map(x=>'<button class="menuitem" data-equip-weapon="'+escapeChat(x)+'">装備する：'+escapeChat(x)+'</button>').join('');
+ const activeWeapon=getWeaponInfo();
+ systemMenu('召集・装備','<p>所持クレジット：'+credits+'　抽選回数：'+gachaCount+'</p><p>レアリティ確率：'+rates+'</p><p class="small">確率は各抽選で独立。ゲーム内通貨のみで、現実のお金は使用しません。</p><p>発見済みの仲間：'+escapeChat(owned)+'</p><button class="menuitem" id="drawCharacter">発見済みの仲間と共鳴（60クレジット）</button><button class="menuitem" id="drawGear">武器を抽選（40クレジット・全100種類）</button><p>武器図鑑：'+weaponCatalog.length+'種類　所持：'+ownedWeapons.length+'種類</p><p>装備中：'+escapeChat(equipped)+' / '+escapeChat(activeWeapon.category)+' / 威力 '+weaponPower+' / 必殺技 '+getSpecialRequirement()+'回</p><p>所持武器から装備：</p>'+weaponButtons+'<button class="menuitem" id="upgradeGear">装備強化（資材10）</button><p class="small">重複した仲間は信頼・育成素材に変換。重複武器は強化素材になります。</p>',()=>{
   document.getElementById('drawCharacter').onclick=()=>{
    if(!companions.length){say('N.O.V.A.：召集対象がありません。まず生存者と実際に出会ってください。');return}
    if(credits<60){say('N.O.V.A.：クレジット不足です。');return}
@@ -374,17 +380,14 @@ function openGacha(){
   document.getElementById('drawGear').onclick=()=>{
    if(credits<40){say('N.O.V.A.：クレジット不足です。');return}
    credits-=40;gachaCount++;const rarity=rollRarity();
-   const pool=[
-    {name:'共鳴ブレード',type:'武器',power:2},{name:'重撃ハンマー',type:'武器',power:3},{name:'時間安定装置',type:'補助',power:1},
-    {name:'記憶耐性コート',type:'防具',power:1},{name:'高出力パルス装置',type:'武器',power:3},{name:'高速連射パルスピストル',type:'武器',power:2},{name:'双短剣',type:'武器',power:2},
-    {name:'残響観測器',type:'解析',power:2},{name:'位相反転シールド',type:'防具',power:3}
-   ];
+   const pool=weaponCatalog;
    const item=pool[Math.floor(Math.random()*pool.length)],label=rarity+' '+item.name;
    const existing=equipment.includes(label)||equipment.some(x=>(typeof x==='string'?x:x.name)===label);
    if(existing){scrap+=rarity==='UR'?20:rarity==='SSR'?14:rarity==='SR'?10:6;say(label+'が重複。強化資材へ変換しました。')}
    else{equipment.push(label);equipped=label;weaponPower=Math.max(weaponPower,item.power+(rarity==='UR'?4:rarity==='SSR'?3:rarity==='SR'?2:0));say(rarity+' 装備獲得：'+item.name+'。装備しました。')}
    updateHUD();save();openGacha();
   };
+  document.querySelectorAll('[data-equip-weapon]').forEach(button=>button.onclick=()=>{const chosen=button.getAttribute('data-equip-weapon');const info=getWeaponInfo(chosen);equipped=chosen;weaponPower=Math.max(1,info.power);specialHits=0;say(info.name+'を装備。'+info.category+' / 必殺技ゲージ '+(info.specialClass==='heavy'?22:info.specialClass==='easy'?46:33)+'回');updateHUD();save();openGacha()});
   document.getElementById('upgradeGear').onclick=()=>{if(scrap<10){say('N.O.V.A.：資材不足です。');return}scrap-=10;weaponPower++;say('装備出力を強化しました。攻撃補正 Lv.'+weaponPower);save();openGacha()};
  });
 }
