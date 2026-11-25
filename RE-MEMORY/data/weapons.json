@@ -1,0 +1,805 @@
+{
+  "version": 1,
+  "weapons": [
+    {
+      "id": "wp_001",
+      "name": "断層大剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_002",
+      "name": "黒曜の巨刃",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_003",
+      "name": "崩界クレイモア",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_004",
+      "name": "重力断ち",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_005",
+      "name": "廃都の処刑剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_006",
+      "name": "時砕きの大剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_007",
+      "name": "鉄骸ブレイカー",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_008",
+      "name": "終末の斬岩剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_009",
+      "name": "轟震の大刃",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_010",
+      "name": "灰燼グレートソード",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_011",
+      "name": "深層掘削剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_012",
+      "name": "断罪の重量刃",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_013",
+      "name": "クロノス・リッパー",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_014",
+      "name": "巨獣砕き",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_015",
+      "name": "鋼殻バスター",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_016",
+      "name": "遺跡守りの大剣",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_017",
+      "name": "震界ハンマー",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_018",
+      "name": "星屑の破城槌",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_019",
+      "name": "虚空粉砕機",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_020",
+      "name": "滅時の大鎌",
+      "category": "大剣・重量武器",
+      "specialClass": "heavy",
+      "power": 4,
+      "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。"
+    },
+    {
+      "id": "wp_021",
+      "name": "共鳴ブレード",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_022",
+      "name": "残光の片刃剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_023",
+      "name": "灰都の騎士剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_024",
+      "name": "時雨の長剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_025",
+      "name": "記憶鋼の剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_026",
+      "name": "薄明のサーベル",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_027",
+      "name": "境界線の剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_028",
+      "name": "白錆びの軍刀",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_029",
+      "name": "観測者の剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_030",
+      "name": "反照ブレード",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_031",
+      "name": "流転の細剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_032",
+      "name": "古代文明の直剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_033",
+      "name": "静寂のレイピア",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_034",
+      "name": "赤銅の戦剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_035",
+      "name": "月蝕の刃",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_036",
+      "name": "時間工学剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_037",
+      "name": "蒼灰のロングソード",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_038",
+      "name": "忘却の剣",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_039",
+      "name": "残響の刀",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_040",
+      "name": "黎明のエッジ",
+      "category": "剣・標準武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_041",
+      "name": "双短剣",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_042",
+      "name": "残像ツインエッジ",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_043",
+      "name": "風切りの双刃",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_044",
+      "name": "影縫いダガー",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_045",
+      "name": "二重螺旋ナイフ",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_046",
+      "name": "閃光の双剣",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_047",
+      "name": "灰羽の小太刀",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_048",
+      "name": "連星ブレード",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_049",
+      "name": "時渡りの双刃",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_050",
+      "name": "無音の暗器",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_051",
+      "name": "残光ツインナイフ",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_052",
+      "name": "疾風の双刃",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_053",
+      "name": "記憶断ちの短剣",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_054",
+      "name": "虚影の二刀",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_055",
+      "name": "白夜のダガー",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_056",
+      "name": "クロックワーク・ツイン",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_057",
+      "name": "流星の小太刀",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_058",
+      "name": "薄霧の双刃",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_059",
+      "name": "反転ナイフ",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_060",
+      "name": "瞬刻の双剣",
+      "category": "双剣・軽量武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_061",
+      "name": "境界穿ちの槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_062",
+      "name": "時層ランス",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_063",
+      "name": "灰原の長槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_064",
+      "name": "残響ハルバード",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_065",
+      "name": "観測塔の薙刀",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_066",
+      "name": "虚空のパイク",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_067",
+      "name": "黒鉄の戦槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_068",
+      "name": "流転のグレイブ",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_069",
+      "name": "断層スピア",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_070",
+      "name": "白磁の長柄刃",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_071",
+      "name": "クロノス・ランサー",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_072",
+      "name": "遺跡騎兵の槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_073",
+      "name": "星屑の三叉槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_074",
+      "name": "薄明の薙刀",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_075",
+      "name": "震動パルチザン",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_076",
+      "name": "記録官の長槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_077",
+      "name": "夜霧の斬槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_078",
+      "name": "反響のポールアーム",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_079",
+      "name": "終端の突撃槍",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_080",
+      "name": "蒼穹のハルバード",
+      "category": "槍・長柄武器",
+      "specialClass": "standard",
+      "power": 3,
+      "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。"
+    },
+    {
+      "id": "wp_081",
+      "name": "高速連射パルスピストル",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_082",
+      "name": "残響カービン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_083",
+      "name": "時相ライフル",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_084",
+      "name": "灰燼リピーター",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_085",
+      "name": "記憶波ハンドガン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_086",
+      "name": "位相レールガン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_087",
+      "name": "観測者の狙撃銃",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_088",
+      "name": "双連装パルスガン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_089",
+      "name": "薄明のサブマシンガン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_090",
+      "name": "クロノス・ブラスター",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_091",
+      "name": "遺跡警備ライフル",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_092",
+      "name": "虚空弾ランチャー",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_093",
+      "name": "反転弾ピストル",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_094",
+      "name": "星屑の散弾銃",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_095",
+      "name": "静寂のマークスマン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_096",
+      "name": "時層バーストガン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_097",
+      "name": "蒼灰の狙撃銃",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_098",
+      "name": "残光オートピストル",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_099",
+      "name": "境界貫通砲",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    },
+    {
+      "id": "wp_100",
+      "name": "記録破壊カノン",
+      "category": "銃器・射撃武器",
+      "specialClass": "easy",
+      "power": 2,
+      "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。"
+    }
+  ]
+}
