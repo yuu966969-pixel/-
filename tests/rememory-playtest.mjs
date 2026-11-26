@@ -10,7 +10,7 @@ const pageErrors = [];
 const dataFailures = [];
 page.on('pageerror', error => pageErrors.push(error.message));
 page.on('response', response => {
-  if (/\\/data\\/(companions|weapons)\\.json/.test(response.url()) && !response.ok()) {
+  if (/\/data\/(companions|weapons)\.json/.test(response.url()) && !response.ok()) {
     dataFailures.push(response.url() + ' -> ' + response.status());
   }
 });
