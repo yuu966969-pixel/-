@@ -601,7 +601,7 @@ function load(requestedKey=null){
  }
  lastSaveLabel='セーブデータなし';return false;
 }
-load();
+load();refreshWeaponModel();refreshArmorVisual();
 setInterval(()=>save(false),20*60*1000);
 addEventListener('beforeunload',()=>save(false));
 </script>
