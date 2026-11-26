@@ -10,9 +10,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形001",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 1
     },
     {
       "id": "wp_002",
@@ -23,9 +24,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形002",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 2
     },
     {
       "id": "wp_003",
@@ -36,9 +38,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形003",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 3
     },
     {
       "id": "wp_004",
@@ -49,9 +52,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形004",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 4
     },
     {
       "id": "wp_005",
@@ -62,9 +66,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形005",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 5
     },
     {
       "id": "wp_006",
@@ -75,9 +80,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形006",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 6
     },
     {
       "id": "wp_007",
@@ -88,9 +94,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形007",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 7
     },
     {
       "id": "wp_008",
@@ -101,9 +108,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形008",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 8
     },
     {
       "id": "wp_009",
@@ -114,9 +122,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形009",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 9
     },
     {
       "id": "wp_010",
@@ -127,9 +136,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形010",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 10
     },
     {
       "id": "wp_011",
@@ -140,9 +150,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形011",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 11
     },
     {
       "id": "wp_012",
@@ -153,9 +164,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形012",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 12
     },
     {
       "id": "wp_013",
@@ -166,9 +178,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形013",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 13
     },
     {
       "id": "wp_014",
@@ -179,9 +192,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形014",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 14
     },
     {
       "id": "wp_015",
@@ -192,9 +206,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形015",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 15
     },
     {
       "id": "wp_016",
@@ -205,9 +220,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形016",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 16
     },
     {
       "id": "wp_017",
@@ -218,9 +234,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形017",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 17
     },
     {
       "id": "wp_018",
@@ -231,9 +248,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形018",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 18
     },
     {
       "id": "wp_019",
@@ -244,9 +262,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形019",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 19
     },
     {
       "id": "wp_020",
@@ -257,9 +276,10 @@
       "description": "大剣・重量武器。一撃の威力に優れるが扱いが難しい重量武器。",
       "attackIntervalMs": 620,
       "visualStyle": "heavy-blade",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形020",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 20
     },
     {
       "id": "wp_021",
@@ -270,9 +290,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形021",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 21
     },
     {
       "id": "wp_022",
@@ -283,9 +304,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形022",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 22
     },
     {
       "id": "wp_023",
@@ -296,9 +318,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形023",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 23
     },
     {
       "id": "wp_024",
@@ -309,9 +332,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形024",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 24
     },
     {
       "id": "wp_025",
@@ -322,9 +346,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形025",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 25
     },
     {
       "id": "wp_026",
@@ -335,9 +360,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形026",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 26
     },
     {
       "id": "wp_027",
@@ -348,9 +374,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形027",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 27
     },
     {
       "id": "wp_028",
@@ -361,9 +388,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形028",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 28
     },
     {
       "id": "wp_029",
@@ -374,9 +402,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形029",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 29
     },
     {
       "id": "wp_030",
@@ -387,9 +416,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形030",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 30
     },
     {
       "id": "wp_031",
@@ -400,9 +430,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形031",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 31
     },
     {
       "id": "wp_032",
@@ -413,9 +444,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形032",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 32
     },
     {
       "id": "wp_033",
@@ -426,9 +458,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形033",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 33
     },
     {
       "id": "wp_034",
@@ -439,9 +472,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形034",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 34
     },
     {
       "id": "wp_035",
@@ -452,9 +486,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形035",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 35
     },
     {
       "id": "wp_036",
@@ -465,9 +500,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形036",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 36
     },
     {
       "id": "wp_037",
@@ -478,9 +514,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形037",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 37
     },
     {
       "id": "wp_038",
@@ -491,9 +528,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形038",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 38
     },
     {
       "id": "wp_039",
@@ -504,9 +542,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形039",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 39
     },
     {
       "id": "wp_040",
@@ -517,9 +556,10 @@
       "description": "剣・標準武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "sword",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形040",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 40
     },
     {
       "id": "wp_041",
@@ -530,9 +570,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形041",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 41
     },
     {
       "id": "wp_042",
@@ -543,9 +584,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形042",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 42
     },
     {
       "id": "wp_043",
@@ -556,9 +598,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形043",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 43
     },
     {
       "id": "wp_044",
@@ -569,9 +612,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形044",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 44
     },
     {
       "id": "wp_045",
@@ -582,9 +626,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形045",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 45
     },
     {
       "id": "wp_046",
@@ -595,9 +640,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形046",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 46
     },
     {
       "id": "wp_047",
@@ -608,9 +654,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形047",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 47
     },
     {
       "id": "wp_048",
@@ -621,9 +668,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形048",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 48
     },
     {
       "id": "wp_049",
@@ -634,9 +682,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形049",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 49
     },
     {
       "id": "wp_050",
@@ -647,9 +696,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形050",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 50
     },
     {
       "id": "wp_051",
@@ -660,9 +710,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形051",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 51
     },
     {
       "id": "wp_052",
@@ -673,9 +724,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形052",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 52
     },
     {
       "id": "wp_053",
@@ -686,9 +738,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形053",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 53
     },
     {
       "id": "wp_054",
@@ -699,9 +752,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形054",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 54
     },
     {
       "id": "wp_055",
@@ -712,9 +766,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形055",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 55
     },
     {
       "id": "wp_056",
@@ -725,9 +780,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形056",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 56
     },
     {
       "id": "wp_057",
@@ -738,9 +794,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形057",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 57
     },
     {
       "id": "wp_058",
@@ -751,9 +808,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形058",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 58
     },
     {
       "id": "wp_059",
@@ -764,9 +822,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形059",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 59
     },
     {
       "id": "wp_060",
@@ -777,9 +836,10 @@
       "description": "双剣・軽量武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "twin-blade",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形060",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 60
     },
     {
       "id": "wp_061",
@@ -790,9 +850,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形061",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 61
     },
     {
       "id": "wp_062",
@@ -803,9 +864,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形062",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 62
     },
     {
       "id": "wp_063",
@@ -816,9 +878,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形063",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 63
     },
     {
       "id": "wp_064",
@@ -829,9 +892,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形064",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 64
     },
     {
       "id": "wp_065",
@@ -842,9 +906,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形065",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 65
     },
     {
       "id": "wp_066",
@@ -855,9 +920,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形066",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 66
     },
     {
       "id": "wp_067",
@@ -868,9 +934,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形067",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 67
     },
     {
       "id": "wp_068",
@@ -881,9 +948,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形068",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 68
     },
     {
       "id": "wp_069",
@@ -894,9 +962,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形069",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 69
     },
     {
       "id": "wp_070",
@@ -907,9 +976,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形070",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 70
     },
     {
       "id": "wp_071",
@@ -920,9 +990,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形071",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 71
     },
     {
       "id": "wp_072",
@@ -933,9 +1004,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形072",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 72
     },
     {
       "id": "wp_073",
@@ -946,9 +1018,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形073",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 73
     },
     {
       "id": "wp_074",
@@ -959,9 +1032,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形074",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 74
     },
     {
       "id": "wp_075",
@@ -972,9 +1046,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形075",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 75
     },
     {
       "id": "wp_076",
@@ -985,9 +1060,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形076",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 76
     },
     {
       "id": "wp_077",
@@ -998,9 +1074,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形077",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 77
     },
     {
       "id": "wp_078",
@@ -1011,9 +1088,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形078",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 78
     },
     {
       "id": "wp_079",
@@ -1024,9 +1102,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形079",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 79
     },
     {
       "id": "wp_080",
@@ -1037,9 +1116,10 @@
       "description": "槍・長柄武器。威力と扱いやすさのバランスに優れた標準武器。",
       "attackIntervalMs": 390,
       "visualStyle": "polearm",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形080",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 80
     },
     {
       "id": "wp_081",
@@ -1050,9 +1130,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形081",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 81
     },
     {
       "id": "wp_082",
@@ -1063,9 +1144,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形082",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 82
     },
     {
       "id": "wp_083",
@@ -1076,9 +1158,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形083",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 83
     },
     {
       "id": "wp_084",
@@ -1089,9 +1172,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形084",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 84
     },
     {
       "id": "wp_085",
@@ -1102,9 +1186,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形085",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 85
     },
     {
       "id": "wp_086",
@@ -1115,9 +1200,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形086",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 86
     },
     {
       "id": "wp_087",
@@ -1128,9 +1214,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形087",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 87
     },
     {
       "id": "wp_088",
@@ -1141,9 +1228,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形088",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 88
     },
     {
       "id": "wp_089",
@@ -1154,9 +1242,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形089",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 89
     },
     {
       "id": "wp_090",
@@ -1167,9 +1256,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形090",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 90
     },
     {
       "id": "wp_091",
@@ -1180,9 +1270,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "時間裂傷",
+      "signatureEffect": "時間裂傷・固有波形091",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 91
     },
     {
       "id": "wp_092",
@@ -1193,9 +1284,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "残像追撃",
+      "signatureEffect": "残像追撃・固有波形092",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 92
     },
     {
       "id": "wp_093",
@@ -1206,9 +1298,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "位相貫通",
+      "signatureEffect": "位相貫通・固有波形093",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 93
     },
     {
       "id": "wp_094",
@@ -1219,9 +1312,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "記憶共鳴",
+      "signatureEffect": "記憶共鳴・固有波形094",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 94
     },
     {
       "id": "wp_095",
@@ -1232,9 +1326,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "穢れ抑制",
+      "signatureEffect": "穢れ抑制・固有波形095",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 95
     },
     {
       "id": "wp_096",
@@ -1245,9 +1340,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "反転衝撃",
+      "signatureEffect": "反転衝撃・固有波形096",
       "passive": "攻撃時に時間残響を残す",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 96
     },
     {
       "id": "wp_097",
@@ -1258,9 +1354,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "共鳴連鎖",
+      "signatureEffect": "共鳴連鎖・固有波形097",
       "passive": "時間異常区域で性能が安定する",
-      "variant": 1
+      "variant": 1,
+      "modelSeed": 97
     },
     {
       "id": "wp_098",
@@ -1271,9 +1368,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "時間固定",
+      "signatureEffect": "時間固定・固有波形098",
       "passive": "連続命中で威力がわずかに上がる",
-      "variant": 2
+      "variant": 2,
+      "modelSeed": 98
     },
     {
       "id": "wp_099",
@@ -1284,9 +1382,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "虚空弾",
+      "signatureEffect": "虚空弾・固有波形099",
       "passive": "穢れへの攻撃効率が上昇する",
-      "variant": 3
+      "variant": 3,
+      "modelSeed": 99
     },
     {
       "id": "wp_100",
@@ -1297,9 +1396,10 @@
       "description": "銃器・射撃武器。素早く連続攻撃しやすい軽量・射撃武器。",
       "attackIntervalMs": 260,
       "visualStyle": "ranged",
-      "signatureEffect": "残光放射",
+      "signatureEffect": "残光放射・固有波形100",
       "passive": "必殺技後の硬直を短縮する",
-      "variant": 4
+      "variant": 4,
+      "modelSeed": 100
     }
   ]
 }
