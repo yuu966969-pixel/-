@@ -29,6 +29,26 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
 .small{font-size:11px;color:#82999e}
 #reticle{position:absolute;left:50%;top:50%;width:5px;height:5px;border:1px solid #d4e6dd;border-radius:50%;opacity:.65}
 #specialGauge{position:absolute;left:50%;bottom:48px;transform:translateX(-50%);width:min(360px,calc(100vw - 48px));padding:9px 13px;background:#101b22e8;border:1px solid #9b7957;border-radius:7px;backdrop-filter:blur(8px);font-size:12px;text-align:center;display:none}#specialGauge.active{display:block}#specialGauge .meter{height:8px;margin-top:6px;background:#283438;border-radius:8px;overflow:hidden}#specialGaugeFill{height:100%;width:0;background:linear-gradient(90deg,#9a704c,#f0c27b);transition:width .12s}#specialGauge.ready{border-color:#e9c17b;box-shadow:0 0 18px #e9b96b55}
+#platformChoices{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px}#platformChoices button{flex:1;min-width:180px;padding:14px 12px;font-size:15px}
+#mobileControls{display:none;position:fixed;inset:auto 0 0;z-index:4;pointer-events:none;padding:14px;justify-content:space-between;align-items:end;gap:12px;touch-action:none}
+body[data-platform="mobile"] #mobileControls{display:flex}
+body[data-platform="mobile"] #controls{display:none}
+body[data-platform="mobile"] #log{bottom:170px;width:min(360px,calc(100vw - 32px));font-size:11px;min-height:48px;padding:8px 10px}
+body[data-platform="mobile"] #stats{top:10px;left:10px;width:175px;padding:8px 10px;font-size:10px;line-height:1.55}
+body[data-platform="mobile"] #stats strong{font-size:12px}
+body[data-platform="mobile"] #objective{top:10px;right:10px;width:155px;padding:8px 10px;font-size:10px;line-height:1.5}
+body[data-platform="mobile"] #brand{top:102px;left:10px;font-size:9px}
+body[data-platform="mobile"] #prompt{bottom:158px;max-width:90vw;white-space:normal;text-align:center;font-size:11px}
+body[data-platform="mobile"] #specialGauge{bottom:140px;width:min(300px,calc(100vw - 32px));font-size:10px;padding:7px}
+.mobile-pad,.mobile-actions{pointer-events:auto;display:grid;gap:7px}
+.mobile-pad{grid-template-columns:repeat(3,48px);grid-template-rows:repeat(2,48px)}
+.mobile-actions{grid-template-columns:repeat(2,52px);grid-template-rows:repeat(3,46px)}
+.mobile-pad button,.mobile-actions button{padding:0;border-radius:12px;background:#10252ddd;border-color:#9bb7b788;font-size:12px;min-width:0;touch-action:none;user-select:none;-webkit-user-select:none}
+.mobile-pad button{font-size:18px}
+.mobile-pad .empty{visibility:hidden}
+.mobile-actions button{font-size:11px}
+body[data-platform="mobile"] #dialog{max-height:88vh}
+@media(max-width:600px){h1{font-size:30px}#dialog{width:calc(100vw - 20px)}#overlay{padding:10px}}
 .hidden{display:none!important}
 </style>
 </head>
@@ -46,12 +66,23 @@ button:focus{outline:2px solid #b5e5d9;outline-offset:3px}
 </div>
 <div id="overlay">
  <div id="dialog" class="panel">
-  <div class="small">A KEYBOARD-ONLY SCI-FI RPG PROTOTYPE</div>
-  <h1>RE:MEMORY</h1><h2>忘却の時間</h2>
-  <p>惑星APURF789。核兵器と時間兵器が衝突した日から、主人公にとって8年。外の世界では数億年が過ぎていた。</p>
-  <p>あなたは20歳になって目覚めた。施設にいるのは、あなたと内部AI N.O.V.A.だけだ。</p>
-  <p class="small">第1章では探索・端末調査・時間操作・穢れの捕獲・基地研究・大型穢れとの決戦までを体験できます。すべてキーボードで操作します。</p>
-  <button id="start" autofocus>Enter — ゲーム開始</button>
+  <div class="small">DEVICE SETUP / PLATFORM SELECT</div>
+  <h1>RE:MEMORY</h1><h2>最初にプレイする端末を選択</h2>
+  <p>使用する端末に合わせて操作方法と画面レイアウトを切り替えます。</p>
+  <div id="platformChoices"><button id="choosePC">パソコンでプレイ</button><button id="chooseMobile">スマートフォン・タブレットでプレイ</button></div>
+  <p class="small">選択後もタイトル画面の設定から端末を切り替えられます。</p>
+ </div>
+</div>
+<div id="mobileControls" aria-label="タッチ操作">
+ <div class="mobile-pad">
+  <button class="empty" tabindex="-1" aria-hidden="true"></button><button data-hold="w" aria-label="前進">▲</button><button class="empty" tabindex="-1" aria-hidden="true"></button>
+  <button data-hold="a" aria-label="左移動">◀</button><button data-hold="s" aria-label="後退">▼</button><button data-hold="d" aria-label="右移動">▶</button>
+ </div>
+ <div class="mobile-actions">
+  <button data-tap="e">調べる</button><button data-tap="q">時間</button>
+  <button data-tap="f">行動</button><button data-tap="g">特殊</button>
+  <button data-tap="c">捕獲</button><button data-hold="shift">ダッシュ</button>
+  <button data-tap="tab" style="grid-column:span 2">メニュー</button>
  </div>
 </div>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js"}}</script>
@@ -499,7 +530,25 @@ function interact(){
 function closeMenu(){menu=false;researchMenu=false;overlay.classList.add('hidden')}
 function openResearch(){if(!terminalRead){say('N.O.V.A.：研究設備の制御コードがありません。先に制御端末を調べてください。');return}menu=true;researchMenu=true;overlay.classList.remove('hidden');document.getElementById('dialog').innerHTML='<div class="small">CHRONOS LAB / KEYBOARD CONSOLE</div><h2>簡易研究コンソール</h2><p>研究段階：'+researchLevel+'　解析：'+(analysisUnlocked?'完了':'未完了')+'</p><button class="menuitem" data-research="1">穢れ記録の解析（観察データ2・エネルギー10）</button><button class="menuitem" data-research="2">時間制御の調整（エネルギー15）現在 Lv.'+timeLevel+'</button><button class="menuitem" data-research="3">耐久機構の修復（エネルギー10）</button><p class="small">↑ ↓：選択　Enter：決定　Esc / Tab：戻る</p>';const choices=[...document.querySelectorAll('[data-research]')];choices.forEach(b=>b.addEventListener('click',()=>researchChoice(Number(b.dataset.research))));choices[0]?.focus();}
 function researchChoice(n){if(!researchMenu)return;if(n===1){if(!(captured||extraKegare.some(x=>x.captured))){say('N.O.V.A.：解析対象がありません。穢れを捕獲してください。');return}if(kegareData<2||energy<10){say('N.O.V.A.：解析資源が不足しています。穢れデータ2・エネルギー10が必要です。');return}kegareData-=2;energy-=10;analysisUnlocked=true;researchLevel++;corruption=Math.max(0,corruption-4);updateHUD();say('N.O.V.A.：穢れの記憶構造を解析。時間変異への高い反応性を確認。侵食を抑える仮説を記録しました。');save();openResearch();}else if(n===2){if(energy<15){say('N.O.V.A.：エネルギー不足です。');return}energy-=15;timeLevel++;researchLevel++;updateHUD();say('N.O.V.A.：時間制御を調整。局所時間操作の持続時間が延長されました。');save();openResearch();}else if(n===3){if(energy<10){say('N.O.V.A.：エネルギー不足です。');return}energy-=10;health=100;updateHUD();say('N.O.V.A.：耐久機構を修復しました。');save();openResearch();}}
-function beginGame(){if(started)return;started=true;overlay.classList.add('hidden');ensureAudio();playTone(220,.3,'triangle',.025);say('N.O.V.A.：覚醒を確認。施設外部の時間経過は数億年単位と推定されます。まず制御端末を調べてください。');}document.getElementById('start').addEventListener('click',beginGame);
+let selectedPlatform='';
+function selectPlatform(platform){
+ selectedPlatform=platform;document.body.dataset.platform=platform;
+ document.getElementById('dialog').innerHTML='<div class="small">A '+(platform==='pc'?'KEYBOARD':'TOUCH')+'-OPTIMIZED SCI-FI RPG</div><h1>RE:MEMORY</h1><h2>忘却の時間</h2><p>惑星APURF789。核兵器と時間兵器が衝突した日から、主人公にとって8年。外の世界では数億年が過ぎていた。</p><p>あなたは20歳になって目覚めた。施設にいるのは、あなたと内部AI N.O.V.A.だけだ。</p><p class="small">'+(platform==='pc'?'移動：WASD / 視点：矢印キー / 調べる：E / メニュー：Tab。':'左下の方向パッドで移動、画面右側をスワイプして視点変更。右下のボタンで各操作。')+'</p><button id="start" autofocus>ゲーム開始</button><button id="changePlatform" style="margin-left:8px">端末を選び直す</button>';
+ document.getElementById('start').addEventListener('click',beginGame);
+ document.getElementById('changePlatform').addEventListener('click',showPlatformChoice);
+}
+function showPlatformChoice(){document.body.removeAttribute('data-platform');document.getElementById('dialog').innerHTML='<div class="small">DEVICE SETUP / PLATFORM SELECT</div><h1>RE:MEMORY</h1><h2>最初にプレイする端末を選択</h2><p>使用する端末に合わせて操作方法と画面レイアウトを切り替えます。</p><div id="platformChoices"><button id="choosePC">パソコンでプレイ</button><button id="chooseMobile">スマートフォン・タブレットでプレイ</button></div><p class="small">選択後も端末を選び直せます。</p>';document.getElementById('choosePC').addEventListener('click',()=>selectPlatform('pc'));document.getElementById('chooseMobile').addEventListener('click',()=>selectPlatform('mobile'));}
+document.getElementById('choosePC').addEventListener('click',()=>selectPlatform('pc'));
+document.getElementById('chooseMobile').addEventListener('click',()=>selectPlatform('mobile'));
+function beginGame(){if(started)return;if(!selectedPlatform){showPlatformChoice();return}started=true;overlay.classList.add('hidden');ensureAudio();playTone(220,.3,'triangle',.025);say('N.O.V.A.：覚醒を確認。施設外部の時間経過は数億年単位と推定されます。まず制御端末を調べてください。');}
+function mobileKeyDown(key){if(key==='tab'){if(started)menu?closeMenu():openMenu();return}if(key==='shift'){keys.add('shift');return}const map={e:'e',q:'q',f:'f',g:'g',c:'c'};const k=map[key];if(!k||!started)return;if(k==='e')interact();else if(k==='f')performAttack();else if(k==='g')performSpecialAttack();else if(k==='q')timeControl();else if(k==='c'){const ev=new KeyboardEvent('keydown',{key:k,bubbles:true});window.dispatchEvent(ev)}}
+function mobileKeyUp(key){keys.delete(key)}
+document.querySelectorAll('#mobileControls [data-hold]').forEach(button=>{const key=button.dataset.hold;button.addEventListener('pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);keys.add(key)});for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,()=>keys.delete(key));});
+document.querySelectorAll('#mobileControls [data-tap]').forEach(button=>button.addEventListener('pointerdown',e=>{e.preventDefault();const key=button.dataset.tap;if(key==='tab'){mobileKeyDown(key);return}if(key==='e')interact();else if(key==='q')timeControl();else if(key==='f')performAttack();else if(key==='g')performSpecialAttack();else if(key==='c'){const event=new KeyboardEvent('keydown',{key:'c',bubbles:true});window.dispatchEvent(event)}}));
+let lookPointer=null,lastLookX=0,lastLookY=0;
+renderer.domElement.addEventListener('pointerdown',e=>{if(selectedPlatform!=='mobile'||!started||menu||e.clientX<innerWidth*.42||e.clientY>innerHeight*.78)return;lookPointer=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
+renderer.domElement.addEventListener('pointermove',e=>{if(lookPointer!==e.pointerId)return;const dx=e.clientX-lastLookX,dy=e.clientY-lastLookY;lastLookX=e.clientX;lastLookY=e.clientY;yaw-=dx*.006;pitch=Math.max(-.55,Math.min(.25,pitch+dy*.0045))});
+for(const type of ['pointerup','pointercancel','lostpointercapture'])renderer.domElement.addEventListener(type,e=>{if(lookPointer===e.pointerId)lookPointer=null});
 addEventListener('keydown',e=>{
  if((['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)&&!(menu&&document.activeElement&&['INPUT','TEXTAREA'].includes(document.activeElement.tagName)))||e.key==='Tab')e.preventDefault();
  if(e.key==='Enter'&&!started){beginGame();return}
@@ -601,7 +650,7 @@ function load(requestedKey=null){
  }
  lastSaveLabel='セーブデータなし';return false;
 }
-if(new URLSearchParams(location.search).has('test')){Object.defineProperty(window,'__REMEMORY_TEST__',{configurable:false,value:Object.freeze({get started(){return started},get menu(){return menu},get weaponCount(){return weaponCatalog.length},get playerPosition(){return{x:player.position.x,y:player.position.y,z:player.position.z}},get saveVersion(){return 13},get equippedWeapon(){return equipped},get equippedArmor(){return equippedArmor},get renderCalls(){return renderer.info.render.calls}})})}
+if(new URLSearchParams(location.search).has('test')){Object.defineProperty(window,'__REMEMORY_TEST__',{configurable:false,value:Object.freeze({get started(){return started},get menu(){return menu},get platform(){return selectedPlatform},get weaponCount(){return weaponCatalog.length},get playerPosition(){return{x:player.position.x,y:player.position.y,z:player.position.z}},get saveVersion(){return 13},get equippedWeapon(){return equipped},get equippedArmor(){return equippedArmor},get renderCalls(){return renderer.info.render.calls}})})}
 load();refreshWeaponModel();refreshArmorVisual();
 setInterval(()=>save(false),20*60*1000);
 addEventListener('beforeunload',()=>save(false));
