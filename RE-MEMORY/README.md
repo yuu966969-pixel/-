@@ -10,6 +10,22 @@ PC専用・キーボード操作のみの3D SF RPGです。現在は第1章を�
 - [武器100種類のデータ](data/weapons.json)
 - [拡張システム仕様](docs/EXPANSION_SYSTEMS.md)
 
+## PCで実際に起動する方法
+
+1. このリポジトリの `RE-MEMORY` フォルダをPCへダウンロードする。
+2. WindowsはPowerShell、macOS/Linuxはターミナルでそのフォルダへ移動する。
+3. ローカルHTTPサーバーを起動する。
+   - Windows: `py -m http.server 8000`
+   - macOS/Linux: `python3 -m http.server 8000`
+4. ChromeまたはEdgeで `http://localhost:8000` を開く。
+5. タイトル画面でEnterを押して開始する。
+
+※ `index.html` を直接ダブルクリックする `file://` 起動は、データJSONとThree.jsの読み込み制限で動作しない。PCとインターネット接続が必要。操作はキーボードのみ。
+
+## ブラウザ動作テスト
+- GitHub ActionsがChromium/WebGL2で起動、3D描画、WASD移動、マップ・武器工房メニュー、セーブを自動確認する。
+- [Playtest workflow](../.github/workflows/rememory-playtest.yml)
+
 ## 起動方法
 - N.O.V.A.とNPCの会話は現在ローカルのルールベース応答です。入力内容は外部サーバーへ送信しません。
 - 外部LLM接続は未実装です。APIキーをブラウザへ置く構成にはしていません。
