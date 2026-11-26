@@ -23,6 +23,8 @@ try {
   await page.waitForTimeout(800);
   assert.ok((await page.evaluate(() => window.__REMEMORY_TEST__.renderCalls)) > 0, '3D scene should render');
 
+  await page.locator('#choosePC').click();
+  assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.platform), 'pc');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.started);
   const before = await page.evaluate(() => window.__REMEMORY_TEST__.playerPosition);
@@ -53,11 +55,26 @@ try {
   assert.equal(saved.version, 13, 'Save data should use schema v13');
   assert.ok(saved.player && Number.isFinite(saved.player.x), 'Save should include player position');
 
+  const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  const mobileErrors = [];
+  mobilePage.on('pageerror', error => mobileErrors.push(error.message));
+  await mobilePage.goto('http://127.0.0.1:4173/?test=1', { waitUntil: 'networkidle', timeout: 60000 });
+  await mobilePage.locator('#game canvas').waitFor({ timeout: 20000 });
+  await mobilePage.locator('#chooseMobile').click();
+  assert.equal(await mobilePage.evaluate(() => window.__REMEMORY_TEST__.platform), 'mobile');
+  await mobilePage.locator('#start').click();
+  await mobilePage.waitForFunction(() => window.__REMEMORY_TEST__.started);
+  assert.equal(await mobilePage.locator('#mobileControls').isVisible(), true, 'Touch controls should be visible on mobile');
+  assert.equal(await mobilePage.locator('[data-hold="w"]').count(), 1, 'Mobile movement pad should be present');
+  assert.equal(await mobilePage.locator('[data-tap="e"]').count(), 1, 'Mobile interaction button should be present');
+  assert.deepEqual(mobileErrors, [], 'Mobile mode should have no uncaught browser exceptions');
+  await mobilePage.close();
+
   assert.deepEqual(dataFailures, [], 'Companion and weapon data should load successfully');
   assert.deepEqual(pageErrors, [], 'No uncaught browser exceptions should occur');
   console.log(JSON.stringify({
     status: 'PASS',
-    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'Enter start', 'W movement', 'keyboard map navigation', 'keyboard armory navigation', 'v13 save'],
+    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'W movement', 'keyboard map navigation', 'keyboard armory navigation', 'v13 save', 'mobile platform selection', 'touch control layout'],
     positionDelta: Math.round(Math.hypot(after.x - before.x, after.z - before.z) * 100) / 100,
     pageErrors
   }, null, 2));
