@@ -38,6 +38,10 @@ try {
   await page.locator('#mFood').click();
   await page.locator('#cookMushroom').click();
   assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.foodInventory.cookedMeal), 1, 'Mushroom should cook into a meal');
+  assert.ok(await page.locator('#cook_root').count() === 1, 'Root vegetable recipe should be available');
+  assert.ok(await page.locator('#cook_berry').count() === 1, 'Berry recipe should be available');
+  assert.ok(await page.locator('#cook_broth').count() === 1, 'Nutrient broth recipe should be available');
+  
   const hungerBeforeMeal = await page.evaluate(() => window.__REMEMORY_TEST__.hunger);
   await page.locator('#eatMeal').click();
   assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.hunger) > hungerBeforeMeal, 'Eating should restore hunger');
@@ -61,7 +65,7 @@ try {
   await page.locator('#saveButton').focus();
   await page.keyboard.press('Enter');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('rememory-apurf789-autosave-v2')));
-  assert.equal(saved.version, 14, 'Save data should use schema v13');
+  assert.equal(saved.version, 15, 'Save data should use schema v13');
   assert.ok(saved.player && Number.isFinite(saved.player.x), 'Save should include player position');
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
@@ -83,7 +87,7 @@ try {
   assert.deepEqual(pageErrors, [], 'No uncaught browser exceptions should occur');
   console.log(JSON.stringify({
     status: 'PASS',
-    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'forage and cooking survival loop', 'keyboard map navigation', 'keyboard armory navigation', 'v14 save', 'hunger HUD', 'forage mushrooms and Kegare meat', 'cook and eat food', 'mobile platform selection', 'touch control layout'],
+    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'forage and cooking survival loop', 'keyboard map navigation', 'keyboard armory navigation', 'v15 save', 'hunger HUD', 'forage mushrooms and Kegare meat', 'cook and eat food', 'mobile platform selection', 'touch control layout'],
     pageErrors
   }, null, 2));
 } catch (error) {
