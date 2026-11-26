@@ -1,0 +1,45 @@
+name: RE-MEMORY PC Playtest
+on:
+  push:
+    branches:
+      - feature/rememory-pc-prototype
+    paths:
+      - 'RE-MEMORY/**'
+      - 'tests/**'
+      - '.github/workflows/rememory-playtest.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-playtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install Playwright
+        run: npm install --no-save --package-lock=false playwright
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Start local game server
+        run: |
+          python3 -m http.server 4173 --directory RE-MEMORY > /tmp/rememory-http.log 2>&1 &
+          for i in $(seq 1 30); do
+            curl --fail http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/rememory-http.log
+          exit 1
+      - name: Run keyboard and gameplay smoke tests
+        run: node tests/rememory-playtest.mjs
+      - name: Upload failure screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rememory-playtest-failure
+          path: /tmp/rememory-playtest-failure.png
+          if-no-files-found: ignore
