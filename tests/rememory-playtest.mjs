@@ -27,6 +27,19 @@ try {
   assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.platform), 'pc');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.started);
+  assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.hunger), 100, 'Hunger should start full');
+  await page.keyboard.press('e');
+  await page.waitForFunction(() => window.__REMEMORY_TEST__.foodInventory.wildMushroom === 1);
+  await page.keyboard.press('e');
+  await page.waitForFunction(() => window.__REMEMORY_TEST__.foodInventory.kegareMeat === 1);
+  await page.keyboard.press('Tab');
+  await page.locator('#mFood').click();
+  await page.locator('#cookMushroom').click();
+  assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.foodInventory.cookedMeal), 1, 'Mushroom should cook into a meal');
+  const hungerBeforeMeal = await page.evaluate(() => window.__REMEMORY_TEST__.hunger);
+  await page.locator('#eatMeal').click();
+  assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.hunger) > hungerBeforeMeal, 'Eating should restore hunger');
+  await page.keyboard.press('Escape');
   const before = await page.evaluate(() => window.__REMEMORY_TEST__.playerPosition);
   await page.keyboard.down('w');
   await page.waitForTimeout(450);
@@ -52,7 +65,7 @@ try {
   await page.locator('#saveButton').focus();
   await page.keyboard.press('Enter');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('rememory-apurf789-autosave-v2')));
-  assert.equal(saved.version, 13, 'Save data should use schema v13');
+  assert.equal(saved.version, 14, 'Save data should use schema v13');
   assert.ok(saved.player && Number.isFinite(saved.player.x), 'Save should include player position');
 
   const mobilePage = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
@@ -74,7 +87,7 @@ try {
   assert.deepEqual(pageErrors, [], 'No uncaught browser exceptions should occur');
   console.log(JSON.stringify({
     status: 'PASS',
-    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'W movement', 'keyboard map navigation', 'keyboard armory navigation', 'v13 save', 'mobile platform selection', 'touch control layout'],
+    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'W movement', 'keyboard map navigation', 'keyboard armory navigation', 'v14 save', 'hunger HUD', 'forage mushrooms and Kegare meat', 'cook and eat food', 'mobile platform selection', 'touch control layout'],
     positionDelta: Math.round(Math.hypot(after.x - before.x, after.z - before.z) * 100) / 100,
     pageErrors
   }, null, 2));
