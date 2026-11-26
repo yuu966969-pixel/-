@@ -80,8 +80,9 @@ body[data-platform="mobile"] #dialog{max-height:88vh}
  </div>
  <div class="mobile-actions">
   <button data-tap="e">調べる</button><button data-tap="q">時間</button>
-  <button data-tap="f">行動</button><button data-tap="g">特殊</button>
-  <button data-tap="c">捕獲</button><button data-hold="shift">ダッシュ</button>
+  <button data-tap="f">行動</button><button data-tap="heavy">強行動</button>
+  <button data-tap="g">特殊</button><button data-tap="c">捕獲</button>
+  <button data-hold="shift">ダッシュ</button><button data-tap="q">時間</button>
   <button data-tap="tab" style="grid-column:span 2">メニュー</button>
  </div>
 </div>
@@ -544,7 +545,7 @@ function beginGame(){if(started)return;if(!selectedPlatform){showPlatformChoice(
 function mobileKeyDown(key){if(key==='tab'){if(started)menu?closeMenu():openMenu();return}if(key==='shift'){keys.add('shift');return}const map={e:'e',q:'q',f:'f',g:'g',c:'c'};const k=map[key];if(!k||!started)return;if(k==='e')interact();else if(k==='f')performAttack();else if(k==='g')performSpecialAttack();else if(k==='q')timeControl();else if(k==='c'){const ev=new KeyboardEvent('keydown',{key:k,bubbles:true});window.dispatchEvent(ev)}}
 function mobileKeyUp(key){keys.delete(key)}
 document.querySelectorAll('#mobileControls [data-hold]').forEach(button=>{const key=button.dataset.hold;button.addEventListener('pointerdown',e=>{e.preventDefault();button.setPointerCapture(e.pointerId);keys.add(key)});for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,()=>keys.delete(key));});
-document.querySelectorAll('#mobileControls [data-tap]').forEach(button=>button.addEventListener('pointerdown',e=>{e.preventDefault();const key=button.dataset.tap;if(key==='tab'){mobileKeyDown(key);return}if(key==='e')interact();else if(key==='q'){const event=new KeyboardEvent('keydown',{key:'q',bubbles:true});window.dispatchEvent(event)}else if(key==='f')performAttack();else if(key==='g')performSpecialAttack();else if(key==='c'){const event=new KeyboardEvent('keydown',{key:'c',bubbles:true});window.dispatchEvent(event)}}));
+document.querySelectorAll('#mobileControls [data-tap]').forEach(button=>button.addEventListener('pointerdown',e=>{e.preventDefault();const key=button.dataset.tap;if(key==='tab'){mobileKeyDown(key);return}if(key==='tab'){if(started)menu?closeMenu():openMenu()}else if(key==='e')interact();else if(key==='q'){const event=new KeyboardEvent('keydown',{key:'q',bubbles:true});window.dispatchEvent(event)}else if(key==='f')performAttack();else if(key==='heavy'){keys.add('shift');performAttack();keys.delete('shift')}else if(key==='g')performSpecialAttack();else if(key==='c'){const event=new KeyboardEvent('keydown',{key:'c',bubbles:true});window.dispatchEvent(event)}}));
 let lookPointer=null,lastLookX=0,lastLookY=0;
 renderer.domElement.style.touchAction='none';
 renderer.domElement.addEventListener('pointerdown',e=>{if(selectedPlatform!=='mobile'||!started||menu||e.clientX<innerWidth*.42||e.clientY>innerHeight*.78)return;lookPointer=e.pointerId;lastLookX=e.clientX;lastLookY=e.clientY;renderer.domElement.setPointerCapture(e.pointerId)});
