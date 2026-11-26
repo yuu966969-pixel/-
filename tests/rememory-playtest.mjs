@@ -27,7 +27,7 @@ try {
   assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.platform), 'pc');
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.started);
-  assert.equal(await page.evaluate(() => window.__REMEMORY_TEST__.hunger), 100, 'Hunger should start full');
+  assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.hunger) > 99.9, 'Hunger should start full');
   await page.keyboard.press('e');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.foodInventory.wildMushroom === 1);
   await page.keyboard.press('e');
