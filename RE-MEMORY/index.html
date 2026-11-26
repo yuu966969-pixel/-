@@ -601,6 +601,7 @@ function load(requestedKey=null){
  }
  lastSaveLabel='セーブデータなし';return false;
 }
+if(new URLSearchParams(location.search).has('test')){Object.defineProperty(window,'__REMEMORY_TEST__',{configurable:false,value:Object.freeze({get started(){return started},get menu(){return menu},get weaponCount(){return weaponCatalog.length},get playerPosition(){return{x:player.position.x,y:player.position.y,z:player.position.z}},get saveVersion(){return 13},get equippedWeapon(){return equipped},get equippedArmor(){return equippedArmor},get renderCalls(){return renderer.info.render.calls}})})}
 load();refreshWeaponModel();refreshArmorVisual();
 setInterval(()=>save(false),20*60*1000);
 addEventListener('beforeunload',()=>save(false));
