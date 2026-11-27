@@ -28,7 +28,7 @@ try {
   await page.keyboard.press('Enter');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.started);
   assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.hunger) > 99.9, 'Hunger should start full');
-  await page.waitForFunction(() => document.querySelector('#prompt')?.textContent.includes('灰降りキノコ'));
+  await page.waitForFunction(() => document.querySelector('#prompt')?.textContent.includes('灰雪マッシュルーム'));
   await page.keyboard.press('e');
   await page.waitForFunction(() => window.__REMEMORY_TEST__.foodInventory.wildMushroom === 1);
   await page.waitForFunction(() => document.querySelector('#prompt')?.textContent.includes('穢れの肉片'));
