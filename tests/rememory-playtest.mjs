@@ -56,9 +56,9 @@ try {
   assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.hunger) > hungerBeforeMeal, 'Eating should restore hunger');
   assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.activeFoodBuffs.swift || 0) === 0, 'Healing meal should not grant an unrelated movement buff');
   await page.keyboard.press('Escape');
+  await page.evaluate(() => window.__REMEMORY_TEST__.testAddFood('charredCorn'));
   await page.keyboard.press('Tab');
   await page.locator('#mFood').click();
-  await page.evaluate(() => window.__REMEMORY_TEST__.testAddFood('charredCorn'));
   await page.locator('#eat_charredCorn').click();
   assert.ok(await page.evaluate(() => window.__REMEMORY_TEST__.activeFoodBuffs.swift > 0), 'Charred corn should grant a timed movement buff');
   await page.keyboard.press('Escape');
