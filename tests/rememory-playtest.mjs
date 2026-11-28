@@ -17,7 +17,7 @@ page.on('response', response => {
 try {
   await page.goto('http://127.0.0.1:4173/?test=1', { waitUntil: 'networkidle', timeout: 60000 });
   await page.locator('#game canvas').waitFor({ timeout: 20000 });
-  await page.waitForFunction(() => window.__REMEMORY_TEST__?.weaponCount === 100 && window.__REMEMORY_TEST__?.foodRecipeCount === 30, null, { timeout: 20000 });
+  await page.waitForFunction(() => window.__REMEMORY_TEST__?.weaponCount === 100 && window.__REMEMORY_TEST__?.foodRecipeCount === 60, null, { timeout: 20000 });
   const webgl = await page.locator('#game canvas').evaluate(canvas => Boolean(canvas.getContext('webgl2')));
   assert.equal(webgl, true, 'WebGL2 renderer should initialize');
   await page.waitForTimeout(800);
@@ -49,7 +49,7 @@ try {
     assert.ok(await page.locator('#cook_' + ({creamSoup:'creamSoup',berryTea:'berryTea',rootHash:'rootHash',peachInfusion:'peachInfusion',cornPorridge:'cornPorridge',crystalJelly:'crystalJelly'}[id])).count() === 1, id + ' recipe should be available');
   }
   assert.ok(await page.getByText('軽足 45秒').count() > 0, 'Food effects should be shown in recipe list');
-  for (const id of ["moonSalad","amberBread","blueSoup","peachTart","spiceCurry","mistRisotto","kegareHotpot","fruitPunch","nutCookies","moonChocolate","starParfait","survivorStew","herbFlatbread","crystalPudding","roastedPeach","finaleHotpot"]) assert.equal(await page.locator('#cook_' + id).count(), 1, id + ' recipe should be available');
+  for (const id of ["creamGratin","honeyPancake","roastPlatter","peachCream","mushroomPasta","berrySorbet","nutSoup","cornCroquette","peachToast","herbNoodles","crystalMousse","campSteak","mushroomToast","peachFizz","rootDumpling","nutRisotto","berryJam","herbSoup","cornMuffin","peachJelly","forestHotpot","berryTart","mintGranita","stuffedRoot","sunsetCurry","creamPeach","mushroomPie","royalParfait","travelerBento","dawnFeast","moonSalad","amberBread","blueSoup","peachTart","spiceCurry","mistRisotto","kegareHotpot","fruitPunch","nutCookies","starParfait","survivorStew","herbFlatbread","crystalPudding","roastedPeach","finaleHotpot"]) assert.equal(await page.locator('#cook_' + id).count(), 1, id + ' recipe should be available');
   
   const hungerBeforeMeal = await page.evaluate(() => window.__REMEMORY_TEST__.hunger);
   await page.evaluate(() => window.__REMEMORY_TEST__.testSetVitals(70, 40, 0));
@@ -105,7 +105,7 @@ try {
   assert.deepEqual(pageErrors, [], 'No uncaught browser exceptions should occur');
   console.log(JSON.stringify({
     status: 'PASS',
-    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'forage and cooking survival loop', 'keyboard map navigation', 'keyboard armory navigation', 'v18 save', '30 cooking recipes', 'food recovery and timed buffs', 'hunger HUD', 'forage mushrooms and Kegare meat', 'cook and eat food', 'mobile platform selection', 'touch control layout'],
+    checks: ['WebGL2 boot', '3D render loop', '100-weapon catalog load', 'PC platform selection', 'Enter start', 'forage and cooking survival loop', 'keyboard map navigation', 'keyboard armory navigation', 'v18 save', '60 cooking recipes', 'food recovery and timed buffs', 'hunger HUD', 'forage mushrooms and Kegare meat', 'cook and eat food', 'mobile platform selection', 'touch control layout'],
     pageErrors
   }, null, 2));
 } catch (error) {
